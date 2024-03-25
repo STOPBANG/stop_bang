@@ -23,6 +23,7 @@
 ## 🧸 서버 실행 방법
 
 노션에서 env 설정 파일 추가 - 경로 : `stop_bang/.env`
+
 노션에서 config.js 파일 추가 - 경로 : `stop_bang/modules/mailer/config.js`
 
 ```
