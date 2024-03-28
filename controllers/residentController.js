@@ -178,10 +178,11 @@ module.exports = {
         let r_username = decoded.userId;
 
         try {
-          await residentModel.deleteAccountProcess(r_username);
+          const result = await residentModel.deleteAccountProcess(r_username);
+          console.log(result);
           res.clearCookie("userType");
-          res.clearCookie("authToken").redirect("/");
-          res.redirect(`/`);
+          res.clearCookie("authToken");
+          res.redirect("/");
         } catch (error) {
           res.render("notFound.ejs", { message: error });
         }

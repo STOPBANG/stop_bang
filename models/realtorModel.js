@@ -17,50 +17,28 @@ module.exports = {
     }
   },
 
-  //공인중개사의 프로필 가져오기
-  getRealtorProfile: async (ra_regno) => {
+  // 공인중개사 공공데이터 조회
+  getRealtorPublicData: async (ra_regno) => {
     try {
       const res = await db.query(
-        `
-			SELECT agentList.rdealer_nm, agentList.cmp_nm, agentList.address, agent.a_profile_image
-			FROM agentList
-			LEFT JOIN agent ON agentList.ra_regno = agent.agentList_ra_regno
-			WHERE agentList.ra_regno = ?;`,
+        `SELECT * FROM agentList WHERE ra_regno = ?;`,
         [ra_regno]
       );
       return res[0];
-    } catch (error) {
+    } catch(error) {
       return error;
     }
   },
-
-  //부동산의 사진, 소개글 가져오기
-  getMainInfo: async (ra_regno) => {
-    let rawQuery = `
-		SELECT ra_regno, a_image1, a_image2, a_image3, a_introduction
-		FROM agent
-		RIGHT OUTER JOIN agentList
-		ON agentList_ra_regno=ra_regno
-		WHERE ra_regno = ?;`;
-    let res = await db.query(rawQuery, [ra_regno]);
-    return res[0][0];
-  },
-
-  getEnteredAgent: async (ra_regno) => {
+  
+  // 공인중개사 개인정보 조회
+  getRealtorPrivateData: async (ra_regno) => {
     try {
       const res = await db.query(
-        `
-			SELECT a_office_hours, contact_number, telno, ra_regno
-			FROM agent_contact
-			RIGHT OUTER JOIN agentList
-			ON agent_contact.agent_agentList_ra_regno = agentList.ra_regno
-			LEFT OUTER JOIN agent
-			ON agentList.ra_regno = agent.agentList_ra_regno
-			WHERE ra_regno = ?;`,
+        `SELECT * FROM agent WHERE agentList_ra_regno = ?;`,
         [ra_regno]
       );
-      return res;
-    } catch (error) {
+      return res[0];
+    } catch(error) {
       return error;
     }
   },

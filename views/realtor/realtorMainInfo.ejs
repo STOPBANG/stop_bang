@@ -2,6 +2,7 @@
 
 <table class="uk-table uk-table-striped">
     <tr>
+        <% if(agent != null) { %>
         <% if(agent.a_image1 == null) { %>
             <td></td>
         <% } else { %>
@@ -18,5 +19,6 @@
             <td><img src="/uploads/<%= agent.a_image3 %>" /></td>
         <% } %>
         <p><%= agent.a_introduction %></p>
+        <% } %>
     </tr>
 </table>

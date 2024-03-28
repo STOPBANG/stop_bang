@@ -40,26 +40,26 @@ module.exports = {
       console.log(res.locals.r_username);
       try {
         let who = await realtorModel.whoAreYou(r_username);
-        let agent = await realtorModel.getRealtorProfile(req.params.ra_regno);
-        let agentMainInfo = await realtorModel.getMainInfo(req.params.ra_regno);
-        let agentSubInfo = await realtorModel.getEnteredAgent(
-          req.params.ra_regno
-        );
+        let agent = await realtorModel.getRealtorPublicData(req.params.ra_regno);
+        let agentPrivate = await realtorModel.getRealtorPrivateData(req.params.ra_regno);
         let getReviews = await realtorModel.getReviewByRaRegno(
           req.params.ra_regno,
           r_username
         );
         let getMyReport = await realtorModel.getReport(req.params, r_username);
-        let statistics = makeStatistics(getReviews);
+        let statistics;
+        if(getReviews.length > 0)
+          statistics = makeStatistics(getReviews);
         let getRating = await realtorModel.getRating(req.params);
+        getRating = getRating === null ? 0 : getRating;
 
         res.locals.who = who;
         res.locals.agent = agent[0];
-        res.locals.agentMainInfo = agentMainInfo;
-        res.locals.agentSubInfo = agentSubInfo[0][0];
+        res.locals.agentPrivate = agentPrivate.length ? agentPrivate[0] : null;
         res.locals.agentReviewData = getReviews;
         res.locals.report = getMyReport;
         res.locals.statistics = statistics;
+        res.locals.rating = getRating;
 
         res.locals.title = `${res.locals.agent.cmp_nm}의 후기`;
         res.locals.direction = `/review/${req.params.ra_regno}/create`;
@@ -83,10 +83,8 @@ module.exports = {
         }
 
         if (getRating === null) {
-          res.locals.rating = 0;
           res.locals.tagsData = null;
         } else {
-          res.locals.rating = getRating;
           res.locals.tagsData = tags.tags;
         }
       } catch (err) {

@@ -4,6 +4,32 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 module.exports = {
+  // 공인중개사 공공데이터 조회
+  getAgentPublicData: async (ra_regno) => {
+    try {
+      const res = await db.query(
+        `SELECT * FROM agentList WHERE ra_regno = ?;`,
+        [ra_regno]
+      );
+      return res[0];
+    } catch(error) {
+      return error;
+    }
+  },
+
+  // 공인중개사 개인정보 조회
+  getAgentPrivateData: async (ra_regno) => {
+    try {
+      const res = await db.query(
+        `SELECT * FROM agent WHERE agentList_ra_regno = ?;`,
+        [ra_regno]
+      );
+      return res[0];
+    } catch(error) {
+      return error;
+    }
+  },
+
   getAgentProfile: async (ra_regno) => {
     try {
       const res = await db.query(

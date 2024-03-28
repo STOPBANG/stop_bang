@@ -148,7 +148,7 @@ let residentModel = {
       await sql.query(rawQuery, [r_username]);
       return 1;
     } catch (error) {
-      return null;
+      return error;
     }
   }
 };
