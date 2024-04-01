@@ -5,6 +5,7 @@ const passwordSchema = new passwordValidator();
 const residentModel = require("../models/residentModel");
 const agentModel = require("../models/agentModel");
 const jwt = require("jsonwebtoken");
+const http = require('http');
 
 function checkUsernameExists(username, responseToClient) {
   residentModel.getUserByUsername(username, (user) => {
@@ -114,25 +115,36 @@ module.exports = {
   },
 
   login: (req, res) => {
-    // Login
-    authModel.getUser(req.body, (userId, isAgent) => {
-      // Error during login
-      if (!userId) {
-        return res.render("users/login");
-      } else {
-        const token = jwt.sign({ userId }, process.env.JWT_SECRET_KEY);
-        // Store user/agent's userId in the cookie upon successful login
-        res.cookie("authToken", token, {
-          maxAge: 86400_000,
-          httpOnly: true,
-        });
-        res.cookie("userType", isAgent ? 0 : 1, {
-          maxAge: 86400_000,
-          httpOnly: true,
-        })
-        .redirect("/");
+    /* msa */
+    const postOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       }
+    };
+    const requestBody = req.body;
+    const request = http.request(
+      'http://stop_bang_login_logout:3000/login',
+      postOptions,
+      forwardResponse => {
+        forwardResponse.on('data', ({authToken}) => {
+          if (authToken === null) {
+            return res.render("users/login");
+          }
+        });
+        res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+        forwardResponse.pipe(res);
+      }
+    );
+    request.on('close', () => {
+      console.log('Sent [login] message to login-logout microservice.');
     });
+    request.on('error', (err) => {
+      console.log('Failed to send [login] message');
+      console.log(err && err.stack || err);
+    });
+    request.write(JSON.stringify(requestBody));
+    request.end();
   },
 
   loginView: (req, res) => {
@@ -140,7 +152,21 @@ module.exports = {
   },
 
   logout: (req, res) => {
-    res.clearCookie("userType");
-    res.clearCookie("authToken").redirect("/");
+    /* msa */
+    const request = http.request(
+      'http://stop_bang_login_logout:3000/logout',
+      forwardResponse => {
+        res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+        forwardResponse.pipe(res);
+      }
+    );
+    request.on('close', () => {
+      console.log('Sent [logout] message to login-logout microservice.');
+    });
+    request.on('error', (err) => {
+      console.log('Failed to send [logout] message');
+      console.log(err && err.stack || err);
+    });
+    request.end();
   },
 };
