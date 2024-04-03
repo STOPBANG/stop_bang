@@ -1,194 +1,270 @@
 const residentModel = require("../models/residentModel");
 const tags = require("../public/assets/tag.js");
 const jwt = require("jsonwebtoken");
+const http = require('http');
 
 module.exports = {
-  myReview: (req, res, next) => {
-    //쿠키로부터 로그인 계정 알아오기
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      )
-      let r_username = decoded.userId;
-      if (r_username == null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-      else {
-        residentModel.getReviewById(r_username, (result, err) => {
-          if (result === null) {
-            console.log("error occured: ", err);
-          } else {
-            res.locals.reviews = result[0];
-            res.locals.tagsData = tags;
-            next();
-          }
+  myReview: (req, res) => {
+    /* msa */
+    const getOptions = {
+      host: 'stop_bang_resident_mypage',
+      port: process.env.MS_PORT,
+      path: '/myReview',
+      method: 'GET',
+      headers: {
+        ...
+        req.headers,
+        auth: res.locals.auth
+      }
+    }
+    const forwardRequest = http.request(
+      getOptions,
+      forwardResponse => {
+        let data = '';
+        forwardResponse.on('data', chunk => {
+          data += chunk;
+        });
+        forwardResponse.on('end', () => {
+          return res.render("resident/myReview", JSON.parse(data));
         });
       }
-    }
-  },
-  myReviewView: (req, res) => {
-    res.render("resident/myReview", { path: "myreview" });
-  },
-  openReview: (req, res, next) => {
-    //쿠키로부터 로그인 계정 알아오기
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      let r_username = decoded.userId;
-      if (r_username == null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-      else {
-        residentModel.getOpenedReviewById(r_username, (result, err) => {
-          if (result === null) {
-            console.log("error occured: ", err);
-          } else {
-            res.locals.openReviews = result[0];
-            res.locals.tagsData = tags;
-            next();
-          }
-        });
-      }
-    }
-  },
-  openReviewView: (req, res) => {
-    res.render("resident/openReview", { path: "openreview" });
-  },
-  bookmark: (req, res, next) => {
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      let r_username = decoded.userId;
-      residentModel.getBookMarkById(r_username, (result, err) => {
-        if (result === null) {
-          console.log("error occured: ", err);
-        } else {
-          res.locals.bookmarks = result[0];
-          next();
-        }
-      });
-    }
-  },
-  bookmarkView: (req, res) => {
-    res.render("resident/bookmark", { path: "bookmark" });
-  },
-  deleteBookmark: (req, res, next) => {
-    residentModel.deleteBookMarkById(req.params.id, (result, err) => {
-      if (result === null) {
-        console.log("error occured: ", err);
-      } else {
-        res.locals.redirect = "/resident/bookmark";
-        next();
-      }
+    );
+    forwardRequest.on('close', () => {
+      console.log('Sent [myReview] message to resident_mypage microservice.');
     });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [myReview] message');
+      console.log(err && err.stack || err);
+    });
+    req.pipe(forwardRequest);
+  },
+  openReview: (req, res) => {
+    /* msa */
+    const getOptions = {
+      host: 'stop_bang_resident_mypage',
+      port: process.env.MS_PORT,
+      path: '/openreview',
+      method: 'GET',
+      headers: {
+        ...
+        req.headers,
+        auth: res.locals.auth
+      }
+    }
+    const forwardRequest = http.request(
+      getOptions,
+      forwardResponse => {
+        let data = '';
+        forwardResponse.on('data', chunk => {
+          data += chunk;
+        });
+        forwardResponse.on('end', () => {
+          return res.render("resident/openReview", JSON.parse(data));
+        });
+      }
+    );
+    forwardRequest.on('close', () => {
+      console.log('Sent [openreview] message to resident_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [openreview] message');
+      console.log(err && err.stack || err);
+    });
+    req.pipe(forwardRequest);
+  },
+  bookmark: (req, res) => {
+    /* msa */
+    const getOptions = {
+      host: 'stop_bang_resident_mypage',
+      port: process.env.MS_PORT,
+      path: '/bookmark',
+      method: 'GET',
+      headers: {
+        ...
+        req.headers,
+        auth: res.locals.auth
+      }
+    }
+    const forwardRequest = http.request(
+      getOptions,
+      forwardResponse => {
+        let data = '';
+        forwardResponse.on('data', chunk => {
+          data += chunk;
+        });
+        forwardResponse.on('end', () => {
+          return res.render("resident/bookmark", JSON.parse(data));
+        });
+      }
+    );
+    forwardRequest.on('close', () => {
+      console.log('Sent [bookmark] message to resident_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [bookmark] message');
+      console.log(err && err.stack || err);
+    });
+    req.pipe(forwardRequest);
+  },
+  deleteBookmark: (req, res) => {
+    /* msa */
+    const postOptions = {
+      host: 'stop_bang_resident_mypage',
+      port: process.env.MS_PORT,
+      path: `/bookmark/${req.params.id}/delete`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }
+    const forwardRequest = http.request(
+      postOptions,
+      forwardResponse => {
+        res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+        forwardResponse.pipe(res);
+      }
+    )
+    forwardRequest.on('close', () => {
+      console.log('Sent [deleteBookmark] message to resident_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [deleteBookmark] message');
+      console.log(err && err.stack || err);
+    });
+    forwardRequest.write(JSON.stringify(req.body));
+    forwardRequest.end();
   },
   settings: (req, res, next) => {
-    //쿠키로부터 로그인 계정 알아오기
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      let r_username = decoded.userId;
-      if (r_username == null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-      else {
-        residentModel.getResidentById(r_username, (result, err) => {
-          if (result === null) {
-            console.log("error occured: ", err);
-          } else {
-            res.locals.resident = result[0][0];
-            next();
-          }
+    /* msa */
+    const getOptions = {
+      host: 'stop_bang_resident_mypage',
+      port: process.env.MS_PORT,
+      path: '/settings',
+      method: 'GET',
+      headers: {
+        ...
+        req.headers,
+        auth: res.locals.auth
+      }
+    }
+    const forwardRequest = http.request(
+      getOptions,
+      forwardResponse => {
+        let data = '';
+        forwardResponse.on('data', chunk => {
+          data += chunk;
+        });
+        forwardResponse.on('end', () => {
+          return res.render("resident/settings", JSON.parse(data));
         });
       }
-  }
-  },
-  settingsView: (req, res) => {
-    res.render("resident/settings", { path: "settings" });
-  },
-  editSettings: (req, res, next) => {
-    next();
+    );
+    forwardRequest.on('close', () => {
+      console.log('Sent [settings] message to resident_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [settings] message');
+      console.log(err && err.stack || err);
+    });
+    req.pipe(forwardRequest);
   },
   updateSettings: (req, res, next) => {
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      let r_username = decoded.userId;
-      const body = req.body;
-      if (r_username === null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-      else {
-        if (body.birth === "") body.birth = null;
-        residentModel.updateResident(r_username, body, (result, err) => {
-          if (result === null) {
-            console.log("error occured: ", err);
-          } else {
-            res.locals.redirect = "/resident/settings";
-            next();
-          }
-        });
+    /* msa */
+    const postOptions = {
+      host: 'stop_bang_resident_mypage',
+      port: process.env.MS_PORT,
+      path: '/settings/update',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth': res.locals.auth
       }
     }
+    const forwardRequest = http.request(
+      postOptions,
+      forwardResponse => {
+        res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+        forwardResponse.pipe(res);
+      }
+    )
+    forwardRequest.on('close', () => {
+      console.log('Sent [updateSettings] message to resident_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [updateSettings] message');
+      console.log(err && err.stack || err);
+    });
+    forwardRequest.write(JSON.stringify(req.body));
+    forwardRequest.end();
   },
   updatePassword: (req, res, next) => {
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      const r_username = decoded.userId;
-      if (r_username === null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-      else {
-        residentModel.updateResidentPassword(r_username, req.body, (result, err) => {
-          if (result === null) {
-            if (err === "pwerror") {
-              res.render('notFound.ejs', {message: "입력한 비밀번호가 잘못되었습니다."});
-            }
-          } else {
-            res.locals.redirect = "/resident/settings";
-            next();
-          }
-        });
+    /* msa */
+    const postOptions = {
+      host: 'stop_bang_resident_mypage',
+      port: process.env.MS_PORT,
+      path: '/settings/pwupdate',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth': res.locals.auth
       }
     }
+    const forwardRequest = http.request(
+      postOptions,
+      forwardResponse => {
+        res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+        forwardResponse.pipe(res);
+      }
+    )
+    forwardRequest.on('close', () => {
+      console.log('Sent [updatePassword] message to resident_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [updatePassword] message');
+      console.log(err && err.stack || err);
+    });
+    forwardRequest.write(JSON.stringify(req.body));
+    forwardRequest.end();
   },
-  redirectView: (req, res, next) => {
-    let redirectPath = res.locals.redirect;
-    if (redirectPath !== undefined) res.redirect(redirectPath);
-    else next();
-  },
-
   deleteAccount: async (req, res) => {
-    try {
-      if (req.cookies.authToken == undefined)
-        res.render("notFound.ejs", { message: "로그인이 필요합니다" });
-      else {
-        const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-        );
-        let r_username = decoded.userId;
-
-        try {
-          const result = await residentModel.deleteAccountProcess(r_username);
-          console.log(result);
-          res.clearCookie("userType");
-          res.clearCookie("authToken");
-          res.redirect("/");
-        } catch (error) {
-          res.render("notFound.ejs", { message: error });
+    /* msa */
+    const postOptions = {
+      host: 'stop_bang_resident_mypage',
+      port: process.env.MS_PORT,
+      path: '/deleteAccount',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth': res.locals.auth
+      }
+    }
+    const forwardRequest = http.request(
+      postOptions,
+      forwardResponse => {
+        if(forwardResponse.statusCode === 302) { // redirect
+          res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+          forwardResponse.pipe(res);
+        } else {
+          let data = '';
+          forwardResponse.on('data', chunk => {
+            data += chunk;
+          });
+          forwardResponse.on('end', () => {
+            const jsonData = JSON.parse(data);
+            if(jsonData.message != null)
+              return res.render('notFound.ejs', jsonData);
+          });
         }
       }
-    } catch (error) {
-      res.render("notFound.ejs", { message: error });
-    }
+    )
+    forwardRequest.on('close', () => {
+      console.log('Sent [deleteAccount] message to resident_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [deleteAccount] message');
+      console.log(err && err.stack || err);
+    });
+    forwardRequest.write(JSON.stringify(req.body));
+    forwardRequest.end();
   }
 };
