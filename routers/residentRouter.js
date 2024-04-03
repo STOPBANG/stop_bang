@@ -3,40 +3,33 @@ const residentController = require("../controllers/residentController");
 
 router.get(
   "/myReview",
-  residentController.myReview,
-  residentController.myReviewView
+  residentController.myReview
 );
 router.get(
   "/openreview",
-  residentController.openReview,
-  residentController.openReviewView
+  residentController.openReview
 );
 router.get(
   "/bookmark",
-  residentController.bookmark,
-  residentController.bookmarkView
+  residentController.bookmark
 );
 router.post(
   "/bookmark/:id/delete",
-  residentController.deleteBookmark,
-  residentController.redirectView
+  residentController.deleteBookmark
 );
 router.get(
   "/settings",
-  residentController.settings,
-  residentController.settingsView
+  residentController.settings
 );
 
 router.post(
   "/settings/update",
-  residentController.updateSettings,
-  residentController.redirectView
+  residentController.updateSettings
 );
 
 router.post(
   "/settings/pwupdate",
-  residentController.updatePassword,
-  residentController.redirectView
+  residentController.updatePassword
 );
 
 router.post(
