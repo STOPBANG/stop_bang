@@ -117,6 +117,9 @@ module.exports = {
   login: (req, res) => {
     /* msa */
     const postOptions = {
+      host: 'stop_bang_login_logout',
+      port: process.env.MS_PORT,
+      path: '/login',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -124,7 +127,6 @@ module.exports = {
     };
     const requestBody = req.body;
     const request = http.request(
-      `http://stop_bang_login_logout:${process.env.LOG_PORT}/login`,
       postOptions,
       forwardResponse => {
         res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
@@ -148,8 +150,17 @@ module.exports = {
 
   logout: (req, res) => {
     /* msa */
+    const postOptions = {
+      host: 'stop_bang_login_logout',
+      port: process.env.MS_PORT,
+      path: '/logout',
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    };
     const request = http.request(
-      'http://stop_bang_login_logout:3000/logout',
+      postOptions,
       forwardResponse => {
         res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
         forwardResponse.pipe(res);
@@ -162,6 +173,7 @@ module.exports = {
       console.log('Failed to send [logout] message');
       console.log(err && err.stack || err);
     });
+    req.pipe(request);
     request.end();
   },
 };
