@@ -124,14 +124,9 @@ module.exports = {
     };
     const requestBody = req.body;
     const request = http.request(
-      'http://stop_bang_login_logout:3000/login',
+      `http://stop_bang_login_logout:${process.env.LOG_PORT}/login`,
       postOptions,
       forwardResponse => {
-        forwardResponse.on('data', ({authToken}) => {
-          if (authToken === null) {
-            return res.render("users/login");
-          }
-        });
         res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
         forwardResponse.pipe(res);
       }
