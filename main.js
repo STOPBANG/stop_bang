@@ -22,16 +22,25 @@ app.use((req, res, next) => {
       req.cookies.authToken,
       process.env.JWT_SECRET_KEY
     );
-    res.locals.auth = decoded.userId;
-    res.locals.userType = req.cookies.userType;
-    res.locals.is_admin = adminControl.getAdmin(decoded.userId);
+    if (decoded.userId == null)
+      return res.render('notFound.ejs', {message: "로그인이 필요합니다"});
+      res.locals.auth = decoded.userId;
+      res.locals.userType = req.cookies.userType;
+      res.locals.is_admin = adminControl.getAdmin(decoded.userId);
   } catch (error) {
     res.locals.auth = "";
     res.locals.userType = "";
     res.locals.is_admin = "";
   }
   next();
-});
+})
+
+const loginCheck = (req, res, next) => {
+  if(req.cookies.authToken == undefined) {
+    return res.render('notFound.ejs', {message: "로그인이 필요합니다"});
+  }
+  next();
+}
 
 //Routers
 const indexRouter = require("./routers/index"),
@@ -55,7 +64,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/", indexRouter);
-app.use("/resident", residentRouter);
+app.use("/resident", loginCheck, residentRouter);
 
 //검색페이지 접근
 app.use("/search", searchRouter);
