@@ -16,6 +16,9 @@ app.use(bodyParser.json());
 
 app.use(cookieParser(process.env.COOKIE_SECRET_KEY));
 
+const { swaggerUi, specs } = require("./swagger/swagger");
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+
 app.use((req, res, next) => {
   try {
     const decoded = jwt.verify(
@@ -63,6 +66,10 @@ app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+/**
+ * @path {GET} http://localhost:3000/
+ * @description 요청 데이터 값이 없고 반환 값이 있는 GET Method
+ */
 app.use("/", indexRouter);
 app.use("/resident", loginCheck, residentRouter);
 

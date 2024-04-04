@@ -17,8 +17,50 @@ const _makeCertificationKey = () => {
   return key;
 };
 
+/**
+ * @swagger
+ * paths:
+ *  /auth/register:
+ *    get:
+ *      summary: "회원가입 페이지"
+ *      description: "회원가입 페이지로 이동, 입주민/공인중개사 선택 필요"
+ *      tags: [Auth]
+ *      responses:
+ *        "200":
+ *          description: 회원가입 페이지로 이동
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                    ok:
+ *                      type: boolean
+ *                    users:
+ *                      type: object
+ */
 router.get("/register", authController.registerView);
 
+/**
+ * @swagger
+ * paths:
+ *  /auth/certification:
+ *    post:
+ *      summary: "이메일 인증 메일 전송"
+ *      description: "이메일 인증 코드를 생성하고 메일 전송"
+ *      tags: [Auth]
+ *      responses:
+ *        "200":
+ *          description: 이메일 전송 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                    ok:
+ *                      type: boolean
+ *                    users:
+ *                      type: object
+ */
 router.post("/certification", async (req, res) => {
   try {
     const { email } = req.body;
@@ -48,6 +90,27 @@ router.post("/certification", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * paths:
+ *  /auth/certification-check:
+ *    post:
+ *      summary: "이메일 인증"
+ *      description: "이메일 인증 시도"
+ *      tags: [Auth]
+ *      responses:
+ *        "200":
+ *          description: 이메일 인증 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                    ok:
+ *                      type: boolean
+ *                    users:
+ *                      type: object
+ */
 router.post("/certification-check", async (req, res) => {
   try {
     const { email, code } = req.body;
@@ -75,6 +138,7 @@ router.post("/certification-check", async (req, res) => {
   }
 });
 
+/* 안 쓰는 코드 */
 router.post("/send-mail", async (req, res, next) => {
   var email = req.body.email;
 
@@ -128,6 +192,7 @@ router.post("/send-mail", async (req, res, next) => {
 });
 
 /* send verification link */
+/* 안 쓰는 코드 */
 router.get("/verify-email", function (req, res, next) {
   connection.query(
     'SELECT * FROM verifications WHERE token ="' + req.query.token + '"',
@@ -170,15 +235,162 @@ router.get("/verify-email", function (req, res, next) {
   );
 });
 
+/**
+ * @swagger
+ * paths:
+ *  /auth/register/agent:
+ *    get:
+ *      summary: "공인중개사 회원가입 페이지"
+ *      description: "공인중개사 회원가입 페이지 렌더링"
+ *      tags: [Auth]
+ *      responses:
+ *        "200":
+ *          description: 공인중개사 회원가입 페이지 렌더링
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                    ok:
+ *                      type: boolean
+ *                    users:
+ *                      type: object
+ */
 router.get("/register/agent", authController.registerAgentView);
+/**
+ * @swagger
+ * paths:
+ *  /auth/register/agent:
+ *    post:
+ *      summary: "공인중개사 회원가입 시도"
+ *      description: "공인중개사 회원가입 폼 제출"
+ *      tags: [Auth]
+ *      responses:
+ *        "200":
+ *          description: 공인중개사 회원가입 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                    ok:
+ *                      type: boolean
+ *                    users:
+ *                      type: object
+ */
 router.post("/register/agent", authController.registerAgent);
 
+/**
+ * @swagger
+ * paths:
+ *  /auth/register/resident:
+ *    get:
+ *      summary: "입주민 회원가입 시도"
+ *      description: "입주민 회원가입 폼 제출"
+ *      tags: [Auth]
+ *      responses:
+ *        "200":
+ *          description: 입주민 회원가입 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                    ok:
+ *                      type: boolean
+ *                    users:
+ *                      type: object
+ */
 router.get("/register/resident", authController.registerResidentView);
+/**
+ * @swagger
+ * paths:
+ *  /auth/register/resident:
+ *    post:
+ *      summary: "입주민 회원가입 시도"
+ *      description: "입주민 회원가입 폼 제출"
+ *      tags: [Auth]
+ *      responses:
+ *        "200":
+ *          description: 입주민 회원가입 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                    ok:
+ *                      type: boolean
+ *                    users:
+ *                      type: object
+ */
 router.post("/register/resident", authController.registerResident);
 
+/**
+ * @swagger
+ * paths:
+ *  /auth/login:
+ *    post:
+ *      summary: "로그인 페이지"
+ *      description: "로그인 페이지 렌더링"
+ *      tags: [Auth]
+ *      responses:
+ *        "200":
+ *          description: 로그인 페이지 렌더링
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                    ok:
+ *                      type: boolean
+ *                    users:
+ *                      type: object
+ */
 router.get("/login", authController.loginView);
+/**
+ * @swagger
+ * paths:
+ *  /auth/login:
+ *    post:
+ *      summary: "로그인 시도"
+ *      description: "입주민, 공인중개사 모두 로그인 시도"
+ *      tags: [Auth]
+ *      responses:
+ *        "200":
+ *          description: 로그인 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                    ok:
+ *                      type: boolean
+ *                    users:
+ *                      type: object
+ */
 router.post("/login", authController.login);
 
+/**
+ * @swagger
+ * paths:
+ *  /auth/logout:
+ *    get:
+ *      summary: "로그아웃"
+ *      description: "입주민, 공인중개사 모두 로그아웃 시도"
+ *      tags: [Auth]
+ *      responses:
+ *        "200":
+ *          description: 로그아웃 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                    ok:
+ *                      type: boolean
+ *                    users:
+ *                      type: object
+ */
 router.get("/logout", authController.logout);
 
 module.exports = router;
