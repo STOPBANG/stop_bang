@@ -8,6 +8,8 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
+const http = require('http');
+
 // Init Upload
 const storage = multer.diskStorage({
   destination: "./public/uploads/",
@@ -71,16 +73,31 @@ module.exports = {
   }),
 
   getAgentPhoneNumber: async (req, res) => {
-    if (!req.query.raRegno) return res.send("Requires `raRegno`");
-    try {
-      const agent = await db.query(
-        `SELECT telno FROM agentList WHERE ra_regno = ?`,
-        [req.query.raRegno]
-      );
-      return res.send({ phoneNumber: agent[0][0].telno });
-    } catch (error) {
-      return res.send(error.message);
+    /* msa */
+    const getOptions = {
+      host: 'stop_bang_register', // !! 회원가입 ms로 분리 !!
+      port: process.env.MS_PORT,
+      path: '/phoneNumber',
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
     }
+    const request = http.request(
+      getOptions,
+      forwardResponse => {
+        res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+        forwardResponse.pipe(res);
+      }
+    );
+    request.on('close', () => {
+      console.log('Sent [getAgentPhoneNumber] message to register microservice.');
+    });
+    request.on('error', (err) => {
+      console.log('Failed to send [getAgentPhoneNumber] message');
+      console.log(err && err.stack || err);
+    });
+    request.end();
   },
 
   //후기 신고
@@ -204,102 +221,165 @@ module.exports = {
     });
   },
 
-  settings: (req, res, next) => {
-    //쿠키로부터 로그인 계정 알아오기
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      agentModel.getAgentById(decoded, (result, err) => {
-        if (result === null) {
-          console.log("error occured: ", err);
-        } else {
-          res.locals.agent = result[0][0];
-          next();
-        }
-      });
+  settings: (req, res) => {
+    /* msa */
+    const getOptions = {
+      host: 'stop_bang_agent_mypage',
+      port: process.env.MS_PORT,
+      path: '/settings',
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'userId': res.locals.auth,
+      }
     }
+    const forwardRequest = http.request(
+      getOptions,
+      forwardResponse => {
+        let data = '';
+        forwardResponse.on('data', chunk => {
+          data += chunk;
+        });
+        forwardResponse.on('end', () => {
+          const result = JSON.parse(data);
+          if(result.agent === null)
+            return res.render('notFound.ejs', { message: result.message });
+          return res.render("agent/settings", result);
+        });
+      }
+    );
+    forwardRequest.on('close', () => {
+      console.log('Sent [settings] message to agent_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [settings] message');
+      console.log(err && err.stack || err);
+    });
+    req.pipe(forwardRequest);
   },
 
-  settingsView: (req, res) => {
-    res.render("agent/settings", { path: "settings" });
-  },
-
-  updateSettings: (req, res, next) => {
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      let a_id = decoded.userId;
-      const body = req.body;
-      if (a_id === null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-      else {
-        agentModel.updateAgent(a_id, body, (result, err) => {
-          if (result === null) {
-            console.log("error occured: ", err);
+  updateSettings: (req, res) => {
+    /* msa */
+    req.body.userId = res.locals.auth;
+    const postOptions = {
+      host: 'stop_bang_agent_mypage',
+      port: process.env.MS_PORT,
+      path: '/settings/update',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+    const forwardRequest = http.request(
+      postOptions,
+      forwardResponse => {
+        let data = '';
+        forwardResponse.on('data', chunk => {
+          data += chunk;
+        });
+        forwardResponse.on('end', () => {
+          if(forwardResponse.statusCode === 302) { // redirect
+            res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+            forwardResponse.pipe(res);
           } else {
-            res.locals.redirect = "/agent/settings";
-            next();
+            const result = JSON.parse(data);
+            if(result.message !== null)
+              return res.render('notFound.ejs', { message: result.message });
           }
         });
       }
-    }
+    );
+    forwardRequest.on('close', () => {
+      console.log('Sent [updateSettings] message to agent_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [updateSettings] message');
+      console.log(err && err.stack || err);
+    });
+    forwardRequest.write(JSON.stringify(req.body));
+    req.pipe(forwardRequest);
   },
-  updatePassword: (req, res, next) => {
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      const a_id = decoded.userId;
-      if (a_id === null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-      else {
-        agentModel.updateAgentPassword(a_id, req.body, (result, err) => {
-          if (result === null) {
-            if (err === "pwerror") {
-              res.render('notFound.ejs', { message: "입력한 비밀번호가 잘못되었습니다." });
-            }
+  updatePassword: (req, res) => {
+    /* msa */
+    req.body.userId = res.locals.auth;
+    const postOptions = {
+      host: 'stop_bang_agent_mypage',
+      port: process.env.MS_PORT,
+      path: '/settings/pwupdate',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+    const forwardRequest = http.request(
+      postOptions,
+      forwardResponse => {
+        let data = '';
+        forwardResponse.on('data', chunk => {
+          data += chunk;
+        });
+        forwardResponse.on('end', () => {
+          if(forwardResponse.statusCode === 302) { // redirect
+            res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+            forwardResponse.pipe(res);
           } else {
-            res.locals.redirect = "/agent/settings";
-            next();
+            const result = JSON.parse(data);
+            if(result.message !== null)
+              return res.render('notFound.ejs', { message: result.message });
           }
         });
       }
-    }
-  },
-  redirectView: (req, res, next) => {
-    let redirectPath = res.locals.redirect;
-    if (redirectPath !== undefined) res.redirect(redirectPath);
-    else next();
+    );
+    forwardRequest.on('close', () => {
+      console.log('Sent [updatePassword] message to agent_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [updatePassword] message');
+      console.log(err && err.stack || err);
+    });
+    forwardRequest.write(JSON.stringify(req.body));
+    req.pipe(forwardRequest);
   },
 
   deleteAccount: async (req, res) => {
-    try {
-      if (req.cookies.authToken == undefined)
-        res.render("notFound.ejs", { message: "로그인이 필요합니다" });
-      else {
-        const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-        );
-        let a_username = decoded.userId;
-
-        try {
-          await agentModel.deleteAccountProcess(a_username);
-          res.clearCookie("userType");
-          res.clearCookie("authToken").redirect("/");
-          res.redirect(`/`);
-        } catch (error) {
-          res.render("notFound.ejs", { message: error });
+    /* msa */
+    req.body.userId = res.locals.auth;
+    const postOptions = {
+      host: 'stop_bang_agent_mypage',
+      port: process.env.MS_PORT,
+      path: '/deleteAccount',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }
+    const forwardRequest = http.request(
+      postOptions,
+      forwardResponse => {
+        if(forwardResponse.statusCode === 302) { // redirect
+          res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+          forwardResponse.pipe(res);
+        } else {
+          let data = '';
+          forwardResponse.on('data', chunk => {
+            data += chunk;
+          });
+          forwardResponse.on('end', () => {
+            const jsonData = JSON.parse(data);
+            if(jsonData.message != null)
+              return res.render('notFound.ejs', jsonData);
+          });
         }
       }
-    } catch (error) {
-      res.render("notFound.ejs", { message: error });
-    }
+    )
+    forwardRequest.on('close', () => {
+      console.log('Sent [deleteAccount] message to agent_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [deleteAccount] message');
+      console.log(err && err.stack || err);
+    });
+    forwardRequest.write(JSON.stringify(req.body));
+    forwardRequest.end();
   }
 };
