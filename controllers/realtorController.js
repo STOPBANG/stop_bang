@@ -14,9 +14,8 @@ module.exports = {
       path: '/:ra_regno',
       method: 'GET',
       headers: {
-        ...
-        req.headers,
-        auth: res.locals.auth
+        'Content-Type': 'application/json',
+        'userId': res.locals.auth,
       }
     }
     const forwardRequest = http.request(
@@ -32,10 +31,10 @@ module.exports = {
       }
     );
     forwardRequest.on('close', () => {
-      console.log('Sent [realtorDetail] message to realtor_page microservice.');
+      console.log('Sent [mainPage] message to realtor_page microservice.');
     });
     forwardRequest.on('error', (err) => {
-      console.log('Failed to send [realtorDetail] message');
+      console.log('Failed to send [mainPage] message');
       console.log(err && err.stack || err);
     });
     req.pipe(forwardRequest);
@@ -83,31 +82,44 @@ module.exports = {
   },
 
   updateBookmark: (req, res) => {
-    if (req.cookies.authToken == undefined)
-      res.render("notFound.ejs", { message: "로그인이 필요합니다" });
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      const r_username = decoded.userId;
-      if (r_username === null)
-        res.render("notFound.ejs", { message: "로그인이 필요합니다" });
-      else {
-        let body = {
-          r_username: r_username,
-          raRegno: req.params.ra_regno,
-          isBookmark: req.body.bookmarkData,
-        };
-        realtorModel.updateBookmark(r_username, body, (result, err) => {
-          if (result === null) {
-            console.log("error occured: ", err);
-          } else {
-            console.log(result);
-            res.redirect(`/realtor/${req.params.ra_regno}`);
-          }
-        });
+     /* msa */
+    req.body.userId = res.locals.auth;
+    const postOptions = {
+      host: 'stop_bang_bookmark',
+      port: process.env.MS_PORT,
+      path: '/:ra_regno/bookmark',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       }
     }
+    const forwardRequest = http.request(
+      postOptions,
+      forwardResponse => {
+        if(forwardResponse.statusCode === 302) { // redirect
+          res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+          forwardResponse.pipe(res);
+        } else {
+          let data = '';
+          forwardResponse.on('data', chunk => {
+            data += chunk;
+          });
+          forwardResponse.on('end', () => {
+            const jsonData = JSON.parse(data);
+            if(jsonData.message != null)
+              return res.render('notFound.ejs', jsonData);
+          });
+        }
+      }
+    )
+    forwardRequest.on('close', () => {
+      console.log('Sent [updateBookmark] message to bookmark microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [updateBookmark] message');
+      console.log(err && err.stack || err);
+    });
+    forwardRequest.write(JSON.stringify(req.body));
+    forwardRequest.end();
   }
 };
