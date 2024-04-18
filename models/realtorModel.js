@@ -2,6 +2,7 @@
 const db = require("../config/db.js");
 
 module.exports = {
+
   //입주민 회원인지 공인중개사 회원인지 확인
   whoAreYou: async (r_username) => {
     try {
@@ -240,5 +241,5 @@ module.exports = {
     } catch (error) {
       result(null, error);
     }
-  },
+  },/**/
 };
