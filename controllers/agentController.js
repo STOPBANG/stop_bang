@@ -10,25 +10,19 @@ const fs = require("fs");
 
 const http = require('http');
 
-// Init Upload
-const storage = multer.diskStorage({
-  destination: "./public/uploads/",
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
+/* msa */
+// gcp bucket
 
-// Init Upload
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 100000000 },
-  fileFilter: function (req, file, cb) {
-    checkFileType(file, cb);
-  }
+const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID;
+const GCP_KEYFILE_PATH = process.env.GCP_KEYFILE_PATH;
+const GCP_BUCKET_NAME = process.env.GCP_BUCKET_NAME;
+
+const {Storage} = require('@google-cloud/storage');
+const storage = new Storage({
+  projectId: GCP_PROJECT_ID,
+  keyFilename: GCP_KEYFILE_PATH
 });
+const bucket = storage.bucket(GCP_BUCKET_NAME);
 
 const makeStatistics = (reviews) => {
   let array = Array.from({ length: 10 }, () => 0);
@@ -65,8 +59,8 @@ function checkFileType(file, cb) {
 
 module.exports = {
   upload: multer({
-    storage: storage,
-    limits: { fileSize: 100000000 },
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: function (req, file, cb) {
       checkFileType(file, cb);
     },
@@ -150,6 +144,12 @@ module.exports = {
           res.locals.agentRating = getRating;
           res.locals.tagsData = tags.tags;
         }
+
+        /* gcs */
+        const profileImage = res.locals.agent.a_profile_image;
+        if(profileImage !== null) {
+          res.locals.agent.a_profile_image = bucket.file(`agent/${profileImage}`).publicUrl();
+        }
       } catch (err) {
         console.error(err.stack);
       }
@@ -199,6 +199,7 @@ module.exports = {
     let getEnteredAgent = await agentModel.getEnteredAgent(req.params.id);
 
     let profileImage = getEnteredAgent[0][0].a_profile_image;
+    console.log(getEnteredAgent[0]);
     let officeHour = getEnteredAgent[0][0].a_office_hours;
     let hours = officeHour != null ? officeHour.split(' ') : null;
 
@@ -213,12 +214,35 @@ module.exports = {
   },
 
   updatingEnteredInfo: (req, res, next) => {
-    console.log(req.file);
-    agentModel.updateEnterdAgentInfo(req.params.id, req.file, req.body, () => {
-      console.log(req.params.id);
-      res.locals.redirect = `/agent/${req.params.id}`;
-      next();
-    });
+    try {
+      let filename = '';
+      /* gcs */
+      if(req.file) {
+        const date = new Date();
+        const fileTime = date.getTime();
+        filename = `${fileTime}-${req.file.originalname}`;
+        const gcsFileDir = `agent/${filename}`;
+        // gcs에 agent 폴더 밑에 파일이 저장
+        const blob = bucket.file(gcsFileDir);
+        const blobStream = blob.createWriteStream();
+
+        blobStream.on('finish', () => {
+          console.log('gcs upload successed');
+        });
+
+        blobStream.on('error', (err) => {
+          console.log(err);
+        });
+
+        blobStream.end(req.file.buffer);
+      }
+      req.file.filename = filename;
+      agentModel.updateEnterdAgentInfo(req.params.id, req.file, req.body, () => {
+        res.redirect(`/agent/${req.params.id}`);
+      });
+    } catch(err) {
+      console.log('updating info err : ', err);
+    }
   },
 
   settings: (req, res) => {
