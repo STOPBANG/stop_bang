@@ -6,6 +6,7 @@ const residentModel = require("../models/residentModel");
 const agentModel = require("../models/agentModel");
 const jwt = require("jsonwebtoken");
 const http = require('http');
+const {httpRequest} = require('../utils/httpRequest');
 
 function checkUsernameExists(username, responseToClient) {
   residentModel.getUserByUsername(username, (user) => {
@@ -42,33 +43,51 @@ module.exports = {
 
     if (!checkPasswordCorrect(body.password))
       return res.render('notFound.ejs', {message: "비밀번호 제약을 확인해주세요"});
-
+  
     checkUsernameExists(body.username, (usernameExists) => {
       if (usernameExists) {
         return res.render('notFound.ejs', {message: "이미 사용중인 아이디입니다."});
       }
+    });
 
-      // Save new user information to the database
-      authModel.registerResident(req.body, (userId) => {
-        // Error during registration
-        if (!userId) {
-          return res.render('notFound.ejs', {message: "회원가입 실패"});
-        } else {
-          const token = jwt.sign({ userId }, process.env.JWT_SECRET_KEY);
-          // Store user's userId in the cookie upon successful registration
-          res
-            .cookie("authToken", token, {
-              maxAge: 86400_000,
-              httpOnly: true,
-            });
-          res.cookie("userType", 1, {
+    /* msa */
+    const postOptions = {
+      host: 'stop_bang_auth_DB',
+      port: process.env.MS_PORT,
+      path: `/db/resident/create`,
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    };
+
+    const requestBody = req.body;
+    httpRequest(postOptions, requestBody);
+    
+    res.redirect('/');
+
+    // 이 부분은 마이크로서비스로 분리가 완료되었을 때 삭제
+    // Save new user information to the database
+    authModel.registerResident(req.body, (userId) => {
+      // Error during registration
+      if (!userId) {
+        return res.render('notFound.ejs', {message: "회원가입 실패"});
+      } else {
+        const token = jwt.sign({ userId }, process.env.JWT_SECRET_KEY);
+        // Store user's userId in the cookie upon successful registration
+        res
+          .cookie("authToken", token, {
             maxAge: 86400_000,
             httpOnly: true,
-          })
-          .redirect("/");
-        }
-      });
+          });
+        res.cookie("userType", 1, {
+          maxAge: 86400_000,
+          httpOnly: true,
+        })
+        .redirect("/");
+      }
     });
+    // 이 부분은 마이크로서비스로 분리가 완료되었을 때 삭제
   },
 
   registerResidentView: (req, res) => {
