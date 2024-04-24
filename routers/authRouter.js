@@ -5,17 +5,7 @@ const authController = require("../controllers/authController");
 const mailer = require("../modules/mailer");
 const path = require("path");
 const db = require("../config/db");
-
-const _makeCertificationKey = () => {
-  var key = ""; // 인증키
-
-  // 난수 생성 후 인증키로 활용
-  for (var i = 0; i < 5; i++) {
-    key = key + Math.floor(Math.random() * (10 - 0));
-  }
-
-  return key;
-};
+const {httpRequest} = require('../utils/httpRequest');
 
 /**
  * @swagger
@@ -68,21 +58,23 @@ router.post("/certification", async (req, res) => {
       return res.status(400).send("Invalid Param");
     }
 
-    const code = _makeCertificationKey();
-    const [rows, fields] = await db.query(
-      `SELECT * FROM certification WHERE email='${email}'`
-    );
-    if (rows.length > 0) {
-      await db.query(
-        `UPDATE certification SET code='${code}' WHERE email='${email}'`
-      );
-    } else {
-      await db.query("INSERT INTO certification (email, code) VALUE(?, ?);", [
-        email,
-        code,
-      ]);
-    }
-    await mailer.sendEmail(email, code);
+    /* msa */
+    const postOptions = {
+      host: 'stop_bang_auth_DB',
+      port: process.env.MS_PORT,
+      path: `/db/cert/create`,
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    };
+
+    const requestBody = req.body;
+    httpRequest(postOptions, requestBody)
+      .then(res => {
+        mailer.sendEmail(res.body.email, res.body.code);
+      });
+
     res.send("Success!");
   } catch (error) {
     console.log(error);
@@ -124,12 +116,24 @@ router.post("/certification-check", async (req, res) => {
       return res.status(400).send("Invalid Param");
     }
 
-    const [rows, fields] = await db.query(
-      `SELECT * FROM certification WHERE email='${email}' AND code='${code}'`
-    );
-    if (!rows[0]) {
-      return res.status(404).send("Data Not Found.");
-    }
+    /* msa */
+    const postOptions = {
+      host: 'stop_bang_auth_DB',
+      port: process.env.MS_PORT,
+      path: `/db/cert/compare`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    };
+
+    const requestBody = req.body;
+    httpRequest(postOptions, requestBody)
+      .then(res => {
+        if(!res) {
+          return res.status(404).send("Data Not Found.");      
+        }
+      })
 
     res.send("Success!");
   } catch (error) {
