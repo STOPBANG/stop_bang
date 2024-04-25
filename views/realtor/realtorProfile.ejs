@@ -3,29 +3,29 @@
 <div class="row">
     <div class="left">
       <div class="photo-left">
-        <% if(agent.a_profile_image == null) { %>
+        <% if(agentPrivate == null) { %>
             <img class = "photo" src="/images/none-image-status.jpg">
         <% } else { %>
-            <img class = "photo" src="/uploads/<%= agent.a_profile_image %>" />
+            <img class = "photo" src="/uploads/<%= agentPrivate.a_profile_image %>" />
             <% } %>
       </div>
       
-      <% if(agent.rdealer_nm == null) { %>
+      <% if(agent.RDEALER_NM == null) { %>
         <div>정보없음</div>
       <% } else { %>
-        <h4 class="name"><%= agent.rdealer_nm %></h4>
+        <h4 class="name"><%= agent.RDEALER_NM %></h4>
         <% } %>
 
-    <% if(agent.cmp_nm == null) { %>
+    <% if(agent.CMP_NM == null) { %>
         <div></div>
     <% } else { %>
-        <p class="info"><%= agent.cmp_nm %></p>
+        <p class="info"><%= agent.CMP_NM %></p>
     <% } %>
 
-    <% if(agent.address == null) { %>
+    <% if(agent.ADDRESS == null) { %>
         <div></div>
     <% } else { %>
-        <p class="info"><%= agent.address %></p>
+        <p class="info"><%= agent.ADDRESS %></p>
     <% } %>
 
     <span>평균 별점</span>

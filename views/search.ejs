@@ -86,7 +86,7 @@
           realtorCpnt(result.rows[i]); //사이드바에 공인중개사 출력 
 
           //지도에 여러 공인중개사 마커 출력 
-          geocoder.addressSearch(result.rows[i].address, callback);
+          geocoder.addressSearch(result.rows[i].ADDRESS, callback);
 
           function callback(results, status) {
             if (status === kakao.maps.services.Status.OK) {
@@ -168,7 +168,7 @@
           realtorCpnt(result.rows[i]); //사이드바에 공인중개사 출력
 
           //지도에 여러 공인중개사 마커 출력
-          geocoder.addressSearch(result.rows[i].address, callback);
+          geocoder.addressSearch(result.rows[i].ADDRESS, callback);
 
           function callback(results, status) {
             if (status === kakao.maps.services.Status.OK) {
@@ -206,7 +206,7 @@
     const nameDiv = document.createElement('div');
     nameDiv.classList.add('agency--name');
     nameDiv.id = 'agency--name';
-    nameDiv.innerHTML = `<a href="/realtor/${row.ra_regno}">${row.cmp_nm}</a>`;
+    nameDiv.innerHTML = `<a href="/realtor/${row.SYS_REGNO}">${row.CMP_NM}</a>`;
     containerDiv.appendChild(nameDiv);
 
     // agency details div
@@ -251,7 +251,7 @@
     //인포윈도우를 생성합니다
     let infowindow = new kakao.maps.InfoWindow({
       position: coords,
-      content: `<div class='custom-mark'> ${row.cmp_nm} </div>`,
+      content: `<div class='custom-mark'> ${row.CMP_NM} </div>`,
     });
 
     kakao.maps.event.addListener(marker, 'mouseover', function() {
@@ -264,7 +264,7 @@
 
     kakao.maps.event.addListener(marker, 'click', function() {
       const agencyName = document.getElementById('agencyName');
-      agencyName.value = row.cmp_nm;
+      agencyName.value = row.CMP_NM;
       infowindow.close();
       onClickAgencyName();
     });

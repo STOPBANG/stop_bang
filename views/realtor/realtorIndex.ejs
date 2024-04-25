@@ -20,7 +20,7 @@
 	</div>
 
   <% if (r_username && who == 1) { %>
-  <form action="/realtor/<%= agent.ra_regno %>/bookmark" method="post">
+  <form action="/realtor/<%= agent.SYS_REGNO %>/bookmark" method="post">
     <input type="hidden" name="bookmarkData" value="<%= bookmark !== 0 ? bookmark.bm_id : 0 %>" />
     <button class="bookmark-button" type="submit">
       <span uk-icon="icon: bookmark; ratio:3; <%= bookmark !== 0 ? "highlight":"" %>"></span>
@@ -29,11 +29,11 @@
   <% } %>
 
   </br>
-  <h1 class="uk-heading-divider"><%= `${agent.cmp_nm}의 후기` %></h1>
+  <h1 class="uk-heading-divider"><%= `${agent.CMP_NM}의 후기` %></h1>
 
-  <% if (agentReviewData.length > 0) { %>
+  <% if (review.length > 0) { %>
   <div class="review-statistics-container">
-    <div>후기 <%= agentReviewData.length %>개의 통계</div>
+    <div>후기 <%= review.length %>개의 통계</div>
     <% console.log(statistics); %>
     <% statistics.forEach((element, index) => { %>
     <div class="layout-row <%= element.id < 5 ? "positive" : "negative" %> stat level<%= index %>" style="width: 300px;justify-content: space-between;">
@@ -44,11 +44,11 @@
   </div>
   <% } %>
 
-  <% if(agentReviewData[0] == null) { %>
+  <% if(review[0] == null) { %>
     <% if(who == 1) { %>
       <h3>첫 후기를 작성해 보세요!</h3>
-      <form action=<%= direction %> method='post'>
-        <input type='hidden' name='raRegno' value=<%= agent.ra_regno %>>
+      <form action='/review/<%= agent.SYS_REGNO %>/create' method='post'>
+        <input type='hidden' name='raRegno' value=<%= agent.SYS_REGNO %>>
         <p><input class="uk-button uk-button-default" type='submit' value='첫 후기 작성하고 🧻 5휴지 받기'></p>
       </form>
     <% } else { %>
@@ -56,7 +56,7 @@
       <a href="/auth/register"><button class="uk-button uk-button-default">회원가입하러 가기</button></a>
     <% } %>
   <% } else { %>
-  <% agentReviewData.forEach(review => { %>
+  <% review.forEach(review => { %>
   <% if(review.check_repo === 1) { %>
     <%- include('./realtorReview.ejs', {r_username: r_username, review: review, report: report, opened: openedReviewData, canOpen: canOpen, who: who, tags: review.tags, tagsData: tagsData}); %>
     <% } else { %>
@@ -71,10 +71,10 @@
       </form>
       <% } else { %>
       <% let flag = 1; %>
-      <% agentReviewData.forEach(review => { if(review.r_username == r_username) flag = 0; }); %>
+      <% review.forEach(review => { if(review.r_username == r_username) flag = 0; }); %>
       <% if(flag == 1) { %>
       <form action=<%= direction %> method='post'>
-        <input type='hidden' name='raRegno' value=<%= agent.ra_regno %>>
+        <input type='hidden' name='raRegno' value=<%= agent.SYS_REGNO %>>
         <p><input class="uk-button uk-button-default" type='submit' value='후기 작성하고 휴지 받기'></p>
       </form>
       <% } else { %>
