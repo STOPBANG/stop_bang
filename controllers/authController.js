@@ -55,16 +55,17 @@ module.exports = {
       host: 'stop_bang_auth_DB',
       port: process.env.MS_PORT,
       path: `/db/resident/create`,
-      method: 'PUT',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       }
     };
 
     const requestBody = req.body;
-    httpRequest(postOptions, requestBody);
-    
-    res.redirect('/');
+    httpRequest(postOptions, requestBody)
+      .then(response => {
+        response.pipe(res);
+      });
 
     // 이 부분은 마이크로서비스로 분리가 완료되었을 때 삭제
     // Save new user information to the database
@@ -107,6 +108,24 @@ module.exports = {
         return res.render('notFound.ejs', {message: "이미 사용중인 아이디입니다."});
       }
 
+    /* msa */
+    const postOptions = {
+      host: 'stop_bang_auth_DB',
+      port: process.env.MS_PORT,
+      path: `/db/agent/create`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    };
+
+    const requestBody = req.body;
+    httpRequest(postOptions, requestBody)
+      .then(response => {
+        response.pipe(res);
+      });
+
+    // 이 부분은 마이크로서비스로 분리가 완료되었을 때 삭제
       // Save new agent information to the database
       authModel.registerAgent(req.body, (userId) => {
         if (!userId) {
@@ -127,6 +146,7 @@ module.exports = {
         }
       });
     });
+    // 이 부분은 마이크로서비스로 분리가 완료되었을 때 삭제
   },
 
   registerAgentView: (req, res) => {
