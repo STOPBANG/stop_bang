@@ -80,7 +80,7 @@ app.use("/search", searchRouter);
 app.use("/agent", agentRouter);
 
 //후기 접근
-app.use("/review", reviewRouter);
+app.use("/review", loginCheck, reviewRouter);
 
 //입주민이 보는 공인중개사 페이지 접근
 app.use("/realtor", realtorRouter);

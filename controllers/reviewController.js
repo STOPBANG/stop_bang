@@ -2,31 +2,61 @@
 const reviewModel = require("../models/reviewModel.js");
 const tags = require("../public/assets/tag.js");
 const jwt = require("jsonwebtoken");
+const {httpRequest} = require("../utils/httpRequest.js");
 
 module.exports = {
   //후기 추가
-  createReview: (req, res) => {
-    reviewModel.getRealtorByRaRegno(req.params, (result) => {
-      res.render("review/writeReview.ejs", {
-        realtor: result,
-        tagsdata: tags.tags,
-      });
+  createReview: async (req, res) => {
+    // 서울시 공공데이터 api
+    const apiResponse = await fetch(
+      `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/landBizInfo/1/1/${req.params.ra_regno}`
+    );
+    const js = await apiResponse.json();
+    const agentPublicData = js.landBizInfo.row[0];
+
+    res.render("review/writeReview.ejs", {
+      realtor: agentPublicData,
+      tagsdata: tags.tags,
     });
   },
 
   //후기 추가 DB 반영
   creatingReview: (req, res) => {
-    //쿠키로부터 로그인 계정 알아오기
-    if (!req.cookies.authToken) return res.send("로그인 필요합니다");
-    const decoded = jwt.verify(
-      req.cookies.authToken,
-      process.env.JWT_SECRET_KEY
-    );
-    let r_id = decoded.userId;
-    if (r_id === null) res.send("로그인이 필요합니다.");
-    reviewModel.createReviewProcess(r_id, req.params, req.body, () => {
-      res.redirect(`/realtor/${req.params.ra_regno}`);
-    });
+    const username = res.locals.auth;
+
+    /* msa */
+    const postOptionsResident = {
+      host: 'stop_bang_auth_DB',
+      port: process.env.MS_PORT,
+      path: `/db/resident/findById`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    };
+    const requestBody = {username};
+    httpRequest(postOptionsResident, requestBody)
+      .then(res => {
+        const postOptions = {
+          host: 'stop_bang_review_DB',
+          port: process.env.MS_PORT,
+          path: `/db/review/create`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+        const requestBody = {
+          ...
+          req.body,
+          r_id: res.body[0].id,
+          ra_regno: req.params.ra_regno,
+        }
+        return httpRequest(postOptions, requestBody);
+      })
+      .then(() => {
+        return res.redirect(`/realtor/${req.params.ra_regno}`);
+      });
   },
 
   //후기 수정
