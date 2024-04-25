@@ -39,7 +39,7 @@ module.exports = {
       });
 
       clientRequest.on('close', () => {
-        console.log('Sent message to auth-db microservice.');
+        console.log('Sent message to microservice.');
       });
 
       // Write request body if present.

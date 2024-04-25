@@ -3,6 +3,7 @@ const e = require("express");
 const realtorModel = require("../models/realtorModel.js");
 const jwt = require("jsonwebtoken");
 const http = require('http');
+const {httpRequest} = require('../utils/httpRequest.js');
 
 module.exports = {
   
@@ -11,37 +12,18 @@ module.exports = {
     const getOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: '/:ra_regno',
+      path: `/realtor/${req.params.ra_regno}`,
       method: 'GET',
       headers: {
+        ...
+        req.headers,
         'Content-Type': 'application/json',
-        'userId': res.locals.auth,
       }
     }
-    const forwardRequest = http.request(
-      getOptions,
-      forwardResponse => {
-        let data = '';
-        forwardResponse.on('data', chunk => {
-          data += chunk;
-        });
-        forwardResponse.on('end', () => {
-          return res.render("realtor/:ra_regno", JSON.parse(data));
-        });
-      }
-    );
-    forwardRequest.on('close', () => {
-      console.log('Sent [mainPage] message to realtor_page microservice.');
-    });
-    forwardRequest.on('error', (err) => {
-      console.log('Failed to send [mainPage] message');
-      console.log(err && err.stack || err);
-    });
-    req.pipe(forwardRequest);
-  },
-  
-  realtorView: (req, res) => {
-    res.render("realtor/realtorIndex.ejs");
+    httpRequest(getOptions)
+      .then((response) => {
+        res.render("realtor/realtorIndex.ejs", response.body);
+      });
   },
 
   opening: async (req, res) => {

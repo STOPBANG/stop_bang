@@ -40,7 +40,6 @@ router.use((req, res, next) => {
 router.get(
   "/:ra_regno",
   realtorController.mainPage,
-  realtorController.realtorView
 );
 /**
  * @swagger
