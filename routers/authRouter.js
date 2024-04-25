@@ -51,36 +51,7 @@ router.get("/register", authController.registerView);
  *                    users:
  *                      type: object
  */
-router.post("/certification", async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email || typeof email !== "string") {
-      return res.status(400).send("Invalid Param");
-    }
-
-    /* msa */
-    const postOptions = {
-      host: 'stop_bang_auth_DB',
-      port: process.env.MS_PORT,
-      path: `/db/cert/create`,
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    };
-
-    const requestBody = req.body;
-    httpRequest(postOptions, requestBody)
-      .then(res => {
-        mailer.sendEmail(res.body.email, res.body.code);
-      });
-
-    res.send("Success!");
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Server Error");
-  }
-});
+router.post("/certification", authController.certification);
 
 /**
  * @swagger
@@ -103,44 +74,7 @@ router.post("/certification", async (req, res) => {
  *                    users:
  *                      type: object
  */
-router.post("/certification-check", async (req, res) => {
-  try {
-    const { email, code } = req.body;
-
-    if (
-      !email ||
-      typeof email !== "string" ||
-      !code ||
-      typeof code !== "string"
-    ) {
-      return res.status(400).send("Invalid Param");
-    }
-
-    /* msa */
-    const postOptions = {
-      host: 'stop_bang_auth_DB',
-      port: process.env.MS_PORT,
-      path: `/db/cert/compare`,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    };
-
-    const requestBody = req.body;
-    httpRequest(postOptions, requestBody)
-      .then(res => {
-        if(!res) {
-          return res.status(404).send("Data Not Found.");      
-        }
-      })
-
-    res.send("Success!");
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Server Error");
-  }
-});
+router.post("/certification-check", authController.certificationCheck);
 
 /* 안 쓰는 코드 */
 router.post("/send-mail", async (req, res, next) => {

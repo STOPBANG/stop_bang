@@ -18,6 +18,7 @@ const GCP_KEYFILE_PATH = process.env.GCP_KEYFILE_PATH;
 const GCP_BUCKET_NAME = process.env.GCP_BUCKET_NAME;
 
 const {Storage} = require('@google-cloud/storage');
+const {httpRequest} = require("../utils/httpRequest.js");
 const storage = new Storage({
   projectId: GCP_PROJECT_ID,
   keyFilename: GCP_KEYFILE_PATH
@@ -67,31 +68,21 @@ module.exports = {
   }),
 
   getAgentPhoneNumber: async (req, res) => {
+    const ra_regno = req.query.raRegno;
+
     /* msa */
     const getOptions = {
-      host: 'stop_bang_register', // !! 회원가입 ms로 분리 !!
+      host: 'stop_bang_register',
       port: process.env.MS_PORT,
-      path: '/phoneNumber',
+      path: `/phoneNumber/${ra_regno}`,
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       }
     }
-    const request = http.request(
-      getOptions,
-      forwardResponse => {
-        res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
-        forwardResponse.pipe(res);
-      }
-    );
-    request.on('close', () => {
-      console.log('Sent [getAgentPhoneNumber] message to register microservice.');
-    });
-    request.on('error', (err) => {
-      console.log('Failed to send [getAgentPhoneNumber] message');
-      console.log(err && err.stack || err);
-    });
-    request.end();
+    const result = await httpRequest(getOptions);
+
+    return res.json(result.body);
   },
 
   //후기 신고
@@ -253,8 +244,9 @@ module.exports = {
       path: '/settings',
       method: 'GET',
       headers: {
+        ...
+        req.headers,
         'Content-Type': 'application/json',
-        'userId': res.locals.auth,
       }
     }
     const forwardRequest = http.request(
