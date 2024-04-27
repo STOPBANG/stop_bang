@@ -10,20 +10,20 @@
             <% } %>
       </div>
       
-      <% if(agent.RDEALER_NM == null) { %>
+      <% if(agent == null) { %>
         <div>정보없음</div>
       <% } else { %>
         <h4 class="name"><%= agent.RDEALER_NM %></h4>
         <% } %>
 
-    <% if(agent.CMP_NM == null) { %>
-        <div></div>
+    <% if(agent == null) { %>
+        <div>정보없음</div>
     <% } else { %>
         <p class="info"><%= agent.CMP_NM %></p>
     <% } %>
 
-    <% if(agent.ADDRESS == null) { %>
-        <div></div>
+    <% if(agent == null) { %>
+        <div>정보없음</div>
     <% } else { %>
         <p class="info"><%= agent.ADDRESS %></p>
     <% } %>

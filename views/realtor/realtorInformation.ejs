@@ -13,14 +13,22 @@
     <tr>
         <th>부동산 연락처</th>
         <td>
-            <%= agent.TELNO%>
+            <% if(agent === null) { %>
+                <p>정보없음</p>
+            <% } else { %>
+                <%= agent.TELNO%>
+            <% } %>
         </td>
     </tr>
     <tr>
         <th>공인중개사 연락처</th>
         <td>
             <% if(agentPrivate === null) { %>
-                <%= agent.TELNO %>
+                <% if(agent === null) { %>
+                    <p>정보없음</p>
+                <% } else { %>
+                    <%= agent.TELNO%>
+                <% } %>
             <% } else { %>
                 <%= agentPrivate.a_phone %>
             <% } %>
