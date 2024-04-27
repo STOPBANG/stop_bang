@@ -85,7 +85,8 @@ module.exports = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-      }
+      },
+      body: {r_username: res.locals.auth}
     }
     const forwardRequest = http.request(
       postOptions,
