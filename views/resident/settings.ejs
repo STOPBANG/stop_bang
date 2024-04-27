@@ -67,9 +67,8 @@
     <input class="uk-input uk-form-width-medium" name="email" value="<%= resident.r_email %>" type="email" />
     <br />
     <label id="residentBirth" class="user-label">🎂 생년월일</label>
-    <input class="uk-input uk-form-width-medium" name="birth" type="date" max="new Date()" placeholder="생년월일 입력하고 휴지 받기" value="<%=
-    resident.r_birth === null ? '' : Intl.DateTimeFormat("fr-CA", {year:
-    "numeric", month: "2-digit", day: "2-digit"}).format(resident.r_birth) %>" />
+    <input class="uk-input uk-form-width-medium" name="birth" placeholder="생년월일 입력하고 휴지 받기" value="<%=
+    resident.r_birth === null ? '' : resident.r_birth.split('T')[0] %>" />
     <br />
     <div class="layout-row">
       <label class="user-label">🧻 나의 휴지</label>
