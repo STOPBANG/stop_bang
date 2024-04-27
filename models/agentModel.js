@@ -206,7 +206,7 @@ module.exports = {
   getEnteredAgent: async (ra_regno) => {
     try {
       const res = await db.query(
-        `SELECT a_office_hours, contact_number, telno, ra_regno
+        `SELECT a_profile_image, a_office_hours, contact_number, telno, ra_regno
 			FROM agentList
 			LEFT JOIN agent_contact
 			ON agentList.ra_regno=agent_contact.agent_agentList_ra_regno
@@ -235,6 +235,7 @@ module.exports = {
 
   updateEnterdAgentInfo: async (ra_regno, file, body, result) => {
     try {
+      console.log(file);
       const office_hour = body.office_hour_start + " to " + body.office_hour_end;
       const res = await db.query(
         `UPDATE agent SET a_profile_image=?, a_office_hours=? 

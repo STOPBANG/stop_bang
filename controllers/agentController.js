@@ -8,25 +8,22 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// Init Upload
-const storage = multer.diskStorage({
-  destination: "./public/uploads/",
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
+const http = require('http');
 
-// Init Upload
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 100000000 },
-  fileFilter: function (req, file, cb) {
-    checkFileType(file, cb);
-  }
+/* msa */
+// gcp bucket
+
+const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID;
+const GCP_KEYFILE_PATH = process.env.GCP_KEYFILE_PATH;
+const GCP_BUCKET_NAME = process.env.GCP_BUCKET_NAME;
+
+const {Storage} = require('@google-cloud/storage');
+const {httpRequest} = require("../utils/httpRequest.js");
+const storage = new Storage({
+  projectId: GCP_PROJECT_ID,
+  keyFilename: GCP_KEYFILE_PATH
 });
+const bucket = storage.bucket(GCP_BUCKET_NAME);
 
 const makeStatistics = (reviews) => {
   let array = Array.from({ length: 10 }, () => 0);
@@ -63,24 +60,29 @@ function checkFileType(file, cb) {
 
 module.exports = {
   upload: multer({
-    storage: storage,
-    limits: { fileSize: 100000000 },
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: function (req, file, cb) {
       checkFileType(file, cb);
     },
   }),
 
   getAgentPhoneNumber: async (req, res) => {
-    if (!req.query.raRegno) return res.send("Requires `raRegno`");
-    try {
-      const agent = await db.query(
-        `SELECT telno FROM agentList WHERE ra_regno = ?`,
-        [req.query.raRegno]
-      );
-      return res.send({ phoneNumber: agent[0][0].telno });
-    } catch (error) {
-      return res.send(error.message);
+    const ra_regno = req.query.raRegno;
+
+    /* msa */
+    const getOptions = {
+      host: 'stop_bang_register',
+      port: process.env.MS_PORT,
+      path: `/phoneNumber/${ra_regno}`,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
     }
+    const result = await httpRequest(getOptions);
+
+    return res.json(result.body);
   },
 
   //후기 신고
@@ -133,6 +135,12 @@ module.exports = {
           res.locals.agentRating = getRating;
           res.locals.tagsData = tags.tags;
         }
+
+        /* gcs */
+        const profileImage = res.locals.agent.a_profile_image;
+        if(profileImage !== null) {
+          res.locals.agent.a_profile_image = bucket.file(`agent/${profileImage}`).publicUrl();
+        }
       } catch (err) {
         console.error(err.stack);
       }
@@ -182,6 +190,7 @@ module.exports = {
     let getEnteredAgent = await agentModel.getEnteredAgent(req.params.id);
 
     let profileImage = getEnteredAgent[0][0].a_profile_image;
+    console.log(getEnteredAgent[0]);
     let officeHour = getEnteredAgent[0][0].a_office_hours;
     let hours = officeHour != null ? officeHour.split(' ') : null;
 
@@ -196,110 +205,197 @@ module.exports = {
   },
 
   updatingEnteredInfo: (req, res, next) => {
-    console.log(req.file);
-    agentModel.updateEnterdAgentInfo(req.params.id, req.file, req.body, () => {
-      console.log(req.params.id);
-      res.locals.redirect = `/agent/${req.params.id}`;
-      next();
-    });
-  },
+    try {
+      let filename = '';
+      /* gcs */
+      if(req.file) {
+        const date = new Date();
+        const fileTime = date.getTime();
+        filename = `${fileTime}-${req.file.originalname}`;
+        const gcsFileDir = `agent/${filename}`;
+        // gcs에 agent 폴더 밑에 파일이 저장
+        const blob = bucket.file(gcsFileDir);
+        const blobStream = blob.createWriteStream();
 
-  settings: (req, res, next) => {
-    //쿠키로부터 로그인 계정 알아오기
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      agentModel.getAgentById(decoded, (result, err) => {
-        if (result === null) {
-          console.log("error occured: ", err);
-        } else {
-          res.locals.agent = result[0][0];
-          next();
-        }
+        blobStream.on('finish', () => {
+          console.log('gcs upload successed');
+        });
+
+        blobStream.on('error', (err) => {
+          console.log(err);
+        });
+
+        blobStream.end(req.file.buffer);
+      }
+      req.file.filename = filename;
+      agentModel.updateEnterdAgentInfo(req.params.id, req.file, req.body, () => {
+        res.redirect(`/agent/${req.params.id}`);
       });
+    } catch(err) {
+      console.log('updating info err : ', err);
     }
   },
 
-  settingsView: (req, res) => {
-    res.render("agent/settings", { path: "settings" });
+  settings: (req, res) => {
+    /* msa */
+    const getOptions = {
+      host: 'stop_bang_agent_mypage',
+      port: process.env.MS_PORT,
+      path: '/settings',
+      method: 'GET',
+      headers: {
+        ...
+        req.headers,
+        'Content-Type': 'application/json',
+      }
+    }
+    const forwardRequest = http.request(
+      getOptions,
+      forwardResponse => {
+        let data = '';
+        forwardResponse.on('data', chunk => {
+          data += chunk;
+        });
+        forwardResponse.on('end', () => {
+          const result = JSON.parse(data);
+          if(result.agent === null)
+            return res.render('notFound.ejs', { message: result.message });
+          return res.render("agent/settings", result);
+        });
+      }
+    );
+    forwardRequest.on('close', () => {
+      console.log('Sent [settings] message to agent_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [settings] message');
+      console.log(err && err.stack || err);
+    });
+    req.pipe(forwardRequest);
   },
 
-  updateSettings: (req, res, next) => {
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      let a_id = decoded.userId;
-      const body = req.body;
-      if (a_id === null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-      else {
-        agentModel.updateAgent(a_id, body, (result, err) => {
-          if (result === null) {
-            console.log("error occured: ", err);
+  updateSettings: (req, res) => {
+    /* msa */
+    req.body.userId = res.locals.auth;
+    const postOptions = {
+      host: 'stop_bang_agent_mypage',
+      port: process.env.MS_PORT,
+      path: '/settings/update',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+    const forwardRequest = http.request(
+      postOptions,
+      forwardResponse => {
+        let data = '';
+        forwardResponse.on('data', chunk => {
+          data += chunk;
+        });
+        forwardResponse.on('end', () => {
+          if(forwardResponse.statusCode === 302) { // redirect
+            res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+            forwardResponse.pipe(res);
           } else {
-            res.locals.redirect = "/agent/settings";
-            next();
+            const result = JSON.parse(data);
+            if(result.message !== null)
+              return res.render('notFound.ejs', { message: result.message });
           }
         });
       }
-    }
+    );
+    forwardRequest.on('close', () => {
+      console.log('Sent [updateSettings] message to agent_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [updateSettings] message');
+      console.log(err && err.stack || err);
+    });
+    forwardRequest.write(JSON.stringify(req.body));
+    req.pipe(forwardRequest);
   },
-  updatePassword: (req, res, next) => {
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      const a_id = decoded.userId;
-      if (a_id === null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-      else {
-        agentModel.updateAgentPassword(a_id, req.body, (result, err) => {
-          if (result === null) {
-            if (err === "pwerror") {
-              res.render('notFound.ejs', { message: "입력한 비밀번호가 잘못되었습니다." });
-            }
+  updatePassword: (req, res) => {
+    /* msa */
+    req.body.userId = res.locals.auth;
+    const postOptions = {
+      host: 'stop_bang_agent_mypage',
+      port: process.env.MS_PORT,
+      path: '/settings/pwupdate',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+    const forwardRequest = http.request(
+      postOptions,
+      forwardResponse => {
+        let data = '';
+        forwardResponse.on('data', chunk => {
+          data += chunk;
+        });
+        forwardResponse.on('end', () => {
+          if(forwardResponse.statusCode === 302) { // redirect
+            res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+            forwardResponse.pipe(res);
           } else {
-            res.locals.redirect = "/agent/settings";
-            next();
+            const result = JSON.parse(data);
+            if(result.message !== null)
+              return res.render('notFound.ejs', { message: result.message });
           }
         });
       }
-    }
-  },
-  redirectView: (req, res, next) => {
-    let redirectPath = res.locals.redirect;
-    if (redirectPath !== undefined) res.redirect(redirectPath);
-    else next();
+    );
+    forwardRequest.on('close', () => {
+      console.log('Sent [updatePassword] message to agent_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [updatePassword] message');
+      console.log(err && err.stack || err);
+    });
+    forwardRequest.write(JSON.stringify(req.body));
+    req.pipe(forwardRequest);
   },
 
   deleteAccount: async (req, res) => {
-    try {
-      if (req.cookies.authToken == undefined)
-        res.render("notFound.ejs", { message: "로그인이 필요합니다" });
-      else {
-        const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-        );
-        let a_username = decoded.userId;
-
-        try {
-          await agentModel.deleteAccountProcess(a_username);
-          res.clearCookie("userType");
-          res.clearCookie("authToken").redirect("/");
-          res.redirect(`/`);
-        } catch (error) {
-          res.render("notFound.ejs", { message: error });
+    /* msa */
+    req.body.userId = res.locals.auth;
+    const postOptions = {
+      host: 'stop_bang_agent_mypage',
+      port: process.env.MS_PORT,
+      path: '/deleteAccount',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }
+    const forwardRequest = http.request(
+      postOptions,
+      forwardResponse => {
+        if(forwardResponse.statusCode === 302) { // redirect
+          res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+          forwardResponse.pipe(res);
+        } else {
+          let data = '';
+          forwardResponse.on('data', chunk => {
+            data += chunk;
+          });
+          forwardResponse.on('end', () => {
+            const jsonData = JSON.parse(data);
+            if(jsonData.message != null)
+              return res.render('notFound.ejs', jsonData);
+          });
         }
       }
-    } catch (error) {
-      res.render("notFound.ejs", { message: error });
-    }
+    )
+    forwardRequest.on('close', () => {
+      console.log('Sent [deleteAccount] message to agent_mypage microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [deleteAccount] message');
+      console.log(err && err.stack || err);
+    });
+    forwardRequest.write(JSON.stringify(req.body));
+    forwardRequest.end();
   }
 };

@@ -25,6 +25,7 @@ const agentController = require("../controllers/agentController.js");
  *                    users:
  *                      type: object
  */
+// [msa] register
 router.get("/phoneNumber", agentController.getAgentPhoneNumber);
 
 /**
@@ -48,8 +49,9 @@ router.get("/phoneNumber", agentController.getAgentPhoneNumber);
  *                    users:
  *                      type: object
  */
+// [msa] agent_mypage
 //agent 사용자 정보 확인용
-router.get("/settings", agentController.settings, agentController.settingsView);
+router.get("/settings", agentController.settings);
 /**
  * @swagger
  * paths:
@@ -71,10 +73,10 @@ router.get("/settings", agentController.settings, agentController.settingsView);
  *                    users:
  *                      type: object
  */
+// [msa] agent_mypage
 router.post(
   "/settings/update",
   agentController.updateSettings,
-  agentController.redirectView
 );
 /**
  * @swagger
@@ -97,10 +99,10 @@ router.post(
  *                    users:
  *                      type: object
  */
+// [msa] agent_mypage
 router.post(
   "/settings/pwupdate",
   agentController.updatePassword,
-  agentController.redirectView
 );
 /**
  * @swagger
@@ -127,6 +129,7 @@ router.post(
  *                    users:
  *                      type: object
  */
+// [msa] agent_page
 //agent 홈 get
 router.get(
   "/:id",
@@ -159,6 +162,7 @@ router.get(
  *                    users:
  *                      type: object
  */
+// [msa] agent_page
 //agent info 수정(영업시간,전화번호)
 router.get("/:id/update", agentController.updateEnteredInfo);
 
@@ -187,11 +191,11 @@ router.get("/:id/update", agentController.updateEnteredInfo);
  *                    users:
  *                      type: object
  */
+// [msa] agent_page
 router.post(
   "/:id/update_process",
   agentController.upload.single("myImage"),
   agentController.updatingEnteredInfo,
-  agentController.redirectView
 );
 
 /**
@@ -219,6 +223,7 @@ router.post(
  *                    users:
  *                      type: object
  */
+// [msa] agent_page
 router.get("/:id/info_edit", agentController.updateMainInfo);
 /**
  * @swagger
@@ -245,11 +250,11 @@ router.get("/:id/info_edit", agentController.updateMainInfo);
  *                    users:
  *                      type: object
  */
+// [msa] agent_page
 router.post(
   "/:id/edit_process",
   agentController.upload.fields([{name: 'myImage1'}, {name: 'myImage2'}, {name: 'myImage3'}]),
   agentController.updatingMainInfo,
-  agentController.redirectView
 );
 
 /**
@@ -277,6 +282,7 @@ router.post(
  *                    users:
  *                      type: object
  */
+// [msa] review
 //후기 신고
 router.get('/report/:rv_id', agentController.reporting);
 
@@ -301,6 +307,7 @@ router.get('/report/:rv_id', agentController.reporting);
  *                    users:
  *                      type: object
  */
+// [msa] agent_mypage
 router.post(
   "/deleteAccount",
   agentController.deleteAccount

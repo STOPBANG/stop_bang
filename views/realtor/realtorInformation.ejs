@@ -13,14 +13,14 @@
     <tr>
         <th>부동산 연락처</th>
         <td>
-            <%= agent.telno%>
+            <%= agent.TELNO%>
         </td>
     </tr>
     <tr>
         <th>공인중개사 연락처</th>
         <td>
             <% if(agentPrivate === null) { %>
-                <%= agent.telno %>
+                <%= agent.TELNO %>
             <% } else { %>
                 <%= agentPrivate.a_phone %>
             <% } %>
