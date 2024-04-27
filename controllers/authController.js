@@ -5,30 +5,6 @@ const jwt = require("jsonwebtoken");
 const http = require('http');
 const {httpRequest} = require('../utils/httpRequest');
 
-function checkUsernameExists(username, responseToClient) {
-  residentModel.getUserByUsername(username, (user) => {
-    if (user[0].length !== 0) return responseToClient(true);
-
-    agentModel.getAgentByUsername(username, (user) => {
-      responseToClient(user[0].length !== 0);
-    });
-  });
-}
-
-function checkPasswordCorrect(password) {
-  const uppercaseRegex = /[A-Z]/;
-  const lowercaseRegex = /[a-z]/;
-  const numberRegex = /[0-9]/;
-  const specialCharRegex = /[!@#$%^&*]/;
-
-  return (
-    uppercaseRegex.test(password) &&
-    lowercaseRegex.test(password) &&
-    numberRegex.test(password) &&
-    specialCharRegex.test(password)
-  );
-}
-
 module.exports = {
   registerView: (req, res) => {
     res.render("users/register");
@@ -83,18 +59,6 @@ module.exports = {
   },
 
   registerResident: (req, res) => {
-    // Check if required fields are missing
-    const body = req.body;
-
-    if (!checkPasswordCorrect(body.password))
-      return res.render('notFound.ejs', {message: "비밀번호 제약을 확인해주세요"});
-  
-    checkUsernameExists(body.username, (usernameExists) => {
-      if (usernameExists) {
-        return res.render('notFound.ejs', {message: "이미 사용중인 아이디입니다."});
-      }
-    });
-
     /* msa */
     const postOptions = {
       host: 'stop_bang_register',
@@ -123,29 +87,6 @@ module.exports = {
     });
     request.write(JSON.stringify(requestBody));
     request.end();
-
-    // 이 부분은 마이크로서비스로 분리가 완료되었을 때 삭제
-    // Save new user information to the database
-    authModel.registerResident(req.body, (userId) => {
-      // Error during registration
-      if (!userId) {
-        return res.render('notFound.ejs', {message: "회원가입 실패"});
-      } else {
-        const token = jwt.sign({ userId }, process.env.JWT_SECRET_KEY);
-        // Store user's userId in the cookie upon successful registration
-        res
-          .cookie("authToken", token, {
-            maxAge: 86400_000,
-            httpOnly: true,
-          });
-        res.cookie("userType", 1, {
-          maxAge: 86400_000,
-          httpOnly: true,
-        })
-        .redirect("/");
-      }
-    });
-    // 이 부분은 마이크로서비스로 분리가 완료되었을 때 삭제
   },
 
   registerResidentView: (req, res) => {
@@ -153,17 +94,6 @@ module.exports = {
   },
 
   registerAgent: (req, res) => {
-    // Check if required fields are missing
-    const body = req.body;
-
-    if (!checkPasswordCorrect(body.password))
-      return res.render('notFound.ejs', {message: "비밀번호 제약을 확인해주세요"});
-
-    checkUsernameExists(body.username, (usernameExists) => {
-      if (usernameExists) {
-        return res.render('notFound.ejs', {message: "이미 사용중인 아이디입니다."});
-      }
-
     /* msa */
     const postOptions = {
       host: 'stop_bang_register',
@@ -192,29 +122,24 @@ module.exports = {
     });
     request.write(JSON.stringify(requestBody));
     request.end();
+  },
 
-    // 이 부분은 마이크로서비스로 분리가 완료되었을 때 삭제
-      // Save new agent information to the database
-      authModel.registerAgent(req.body, (userId) => {
-        if (!userId) {
-          return res.render('notFound.ejs', {message: "회원가입 실패"});
-        } else {
-          const token = jwt.sign({ userId }, process.env.JWT_SECRET_KEY);
-          // Store agent's userId in the cookie upon successful registration
-          res
-            .cookie("authToken", token, {
-              maxAge: 86400_000,
-              httpOnly: true,
-            });
-          res.cookie("userType", 0, {
-            maxAge: 86400_000,
-            httpOnly: true,
-          })
-          .redirect("/");
-        }
-      });
-    });
-    // 이 부분은 마이크로서비스로 분리가 완료되었을 때 삭제
+  getAgentPhoneNumber: async (req, res) => {
+    const ra_regno = req.query.raRegno;
+
+    /* msa */
+    const getOptions = {
+      host: 'stop_bang_register',
+      port: process.env.MS_PORT,
+      path: `/register/agent/phoneNumber/${ra_regno}`,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }
+    const result = await httpRequest(getOptions);
+
+    return res.json(result.body);
   },
 
   registerAgentView: (req, res) => {
