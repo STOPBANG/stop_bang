@@ -31,7 +31,8 @@ module.exports = {
         ...
         req.headers,
         'Content-Type': 'application/json',
-      }
+      },
+      body: {r_username: r_username}
     }
 
     httpRequest(getOptions)
@@ -83,7 +84,7 @@ module.exports = {
     const postOptions = {
       host: 'stop_bang_bookmark',
       port: process.env.MS_PORT,
-      path: '/:ra_regno/bookmark',
+      path: `/realtor/${req.params.ra_regno}/bookmark`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
