@@ -19,7 +19,7 @@ module.exports = {
       let r_username = decoded.userId;
       if (r_username === null)
         return res.render("notFound.ejs", { message: "로그인이 필요합니다" });
-    } 
+    
 
     /* msa */
     const getOptions = {
@@ -39,6 +39,7 @@ module.exports = {
       .then((response) => {
         res.render("realtor/realtorIndex.ejs", response.body);
       });
+    }
   },
 
   opening: async (req, res) => {
