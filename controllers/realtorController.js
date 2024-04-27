@@ -8,6 +8,7 @@ const {httpRequest} = require('../utils/httpRequest.js');
 module.exports = {
   
   mainPage: async (req, res, next) => {
+    
     /* msa */
     const getOptions = {
       host: 'stop_bang_realtor_page',
@@ -19,6 +20,17 @@ module.exports = {
         req.headers,
         'Content-Type': 'application/json',
       }
+    }
+    if (req.cookies.authToken == undefined)
+      res.render("notFound.ejs", { message: "로그인이 필요합니다" });
+    else {
+      const decoded = jwt.verify(
+        req.cookies.authToken,
+        process.env.JWT_SECRET_KEY
+      );
+      let r_username = decoded.userId;
+      if (r_username === null)
+        res.render("notFound.ejs", { message: "로그인이 필요합니다" });
     }
     httpRequest(getOptions)
       .then((response) => {
