@@ -17,18 +17,18 @@ exports.getAgency = async(req,res) => {
     const js = await apiResponse.json();
 
     // const rows = await searchModel.getAgenciesModel(sgg_nm, bjdong_nm);
-    const rows = js.landBizInfo.row;
-    const filtered = [];
-
-    for(const row of rows) {
-      if(row.SGG_NM == sgg_nm && row.BJDONG_NM == bjdong_nm) {
-        filtered.push(row);
-        row.avg_rating = 0;
-        row.countReview = 0;
-      }
-    }
+    const rows = js.landBizInfo.row; //API로부터 받은 데이터 중 실제 부동산 중개업소 정보가 저장된 배열
+    const filtered = rows.map(row => ({ ...row, avg_rating: 0, countReview: 0 }));  // map을 사용하여 필터링 및 추가 데이터 삽입
 
     res.json({ rows: filtered });
+    // for(const row of rows) {
+    //   if(row.SGG_NM == sgg_nm && row.BJDONG_NM == bjdong_nm) {
+    //     filtered.push(row);
+    //     row.avg_rating = 0;
+    //     row.countReview = 0;
+    //   }
+    // }
+    console.log(filtered)
   } catch (err) {
     console.error(err.stack);
   }
@@ -64,5 +64,8 @@ exports.getOneAgency = async(req, res) => {
     // res.json({ rows: rows });
   } catch (err) {
     console.error(err.stack)
+  }
+  if (!res.headersSent) {  // 헤더가 이미 전송되지 않았는지 확인
+    res.status(500).json({ error: "Internal Server Error", details: err.stack });
   }
 };
