@@ -6,9 +6,8 @@ const http = require('http');
 const {httpRequest} = require('../utils/httpRequest.js');
 
 module.exports = {
-  
+  /* msa */
   mainPage: async (req, res, next) => {
-    
     if (req.cookies.authToken == undefined)
       return res.render("notFound.ejs", { message: "로그인이 필요합니다" });
     else {
@@ -20,8 +19,6 @@ module.exports = {
       if (r_username === null)
         return res.render("notFound.ejs", { message: "로그인이 필요합니다" });
     
-
-    /* msa */
     const getOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
@@ -78,9 +75,8 @@ module.exports = {
       res.redirect(`${req.baseUrl}/${ra_regno[0][0].agentList_ra_regno}`);
     }
   },
-
+  /* msa */
   updateBookmark: (req, res) => {
-     /* msa */
     req.body.userId = res.locals.auth;
     const postOptions = {
       host: 'stop_bang_bookmark',
@@ -94,20 +90,8 @@ module.exports = {
     const forwardRequest = http.request(
       postOptions,
       forwardResponse => {
-        if(forwardResponse.statusCode === 302) { // redirect
-          res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
-          forwardResponse.pipe(res);
-        } else {
-          let data = '';
-          forwardResponse.on('data', chunk => {
-            data += chunk;
-          });
-          forwardResponse.on('end', () => {
-            const jsonData = JSON.parse(data);
-            if(jsonData.message != null)
-              return res.render('notFound.ejs', jsonData);
-          });
-        }
+        res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+        forwardResponse.pipe(res);
       }
     )
     forwardRequest.on('close', () => {
