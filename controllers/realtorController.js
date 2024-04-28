@@ -86,7 +86,7 @@ module.exports = {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: {r_username: res.locals.auth}
+      body: {r_id: r_id}
     }
     const forwardRequest = http.request(
       postOptions,
