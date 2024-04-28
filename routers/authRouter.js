@@ -189,7 +189,7 @@ router.post("/register/agent", authController.registerAgent);
  *                    users:
  *                      type: object
  */
-router.get("/register/agent/phoneNumber", authController.getAgentPhoneNumber);
+router.get("/register/agent/phoneNumber/:ra_regno", authController.getAgentPhoneNumber);
 
 /**
  * @swagger

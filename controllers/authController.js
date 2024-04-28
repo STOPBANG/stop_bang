@@ -126,6 +126,7 @@ module.exports = {
 
   getAgentPhoneNumber: async (req, res) => {
     const ra_regno = req.query.raRegno;
+    console.log(`${ra_regno}`)
 
     /* msa */
     const getOptions = {
