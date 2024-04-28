@@ -76,102 +76,51 @@ router.post("/certification", authController.certification);
  */
 router.post("/certification-check", authController.certificationCheck);
 
-/* 안 쓰는 코드 */
-router.post("/send-mail", async (req, res, next) => {
-  var email = req.body.email;
+/**
+ * @swagger
+ * paths:
+ *  /auth/register/resident:
+ *    get:
+ *      summary: "입주민 회원가입 페이지"
+ *      description: "입주민 회원가입 페이지 렌더링"
+ *      tags: [Auth]
+ *      responses:
+ *        "200":
+ *          description: 입주민 회원가입 페이지 렌더링
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                    ok:
+ *                      type: boolean
+ *                    users:
+ *                      type: object
+ */
+router.get("/register/resident", authController.registerResidentView);
 
-  // console.log(sendEmail(email, fullUrl));
-
-  connection.query(
-    'SELECT * FROM verifications WHERE email ="' + email + '"',
-    function (err, result) {
-      if (err) throw err;
-
-      var type = "success";
-      var msg = "Email already verified";
-
-      console.log("jjj", result[0]);
-
-      if (result.length > 0) {
-        var token = randtoken.generate(20);
-
-        if (result[0].verify == 0) {
-          var sent = sendEmail(email, token);
-          if (sent != "0") {
-            var data = {
-              token: token,
-            };
-
-            connection.query(
-              'UPDATE verifications SET ? WHERE email ="' + email + '"',
-              data,
-              function (err, result) {
-                if (err) throw err;
-              }
-            );
-
-            type = "success";
-            msg = "The verification link has been sent to your email address";
-          } else {
-            type = "error";
-            msg = "Something goes to wrong. Please try again";
-          }
-        }
-      } else {
-        console.log("2");
-        type = "error";
-        msg = "The Email is not registered with us";
-      }
-
-      req.flash(type, msg);
-      res.redirect("/");
-    }
-  );
-});
-
-/* send verification link */
-/* 안 쓰는 코드 */
-router.get("/verify-email", function (req, res, next) {
-  connection.query(
-    'SELECT * FROM verifications WHERE token ="' + req.query.token + '"',
-    function (err, result) {
-      if (err) throw err;
-
-      var type;
-      var msg;
-
-      console.log("lll", result[0].verify);
-
-      if (result[0].verify == 0) {
-        if (result.length > 0) {
-          var data = {
-            verify: 1,
-          };
-
-          connection.query(
-            'UPDATE verifications SET ? WHERE email ="' + result[0].email + '"',
-            data,
-            function (err, result) {
-              if (err) throw err;
-            }
-          );
-          type = "success";
-          msg = "Your email has been verified";
-        } else {
-          console.log("2");
-          type = "success";
-          msg = "The email has already verified";
-        }
-      } else {
-        type = "error";
-        msg = "The email has been already verified";
-      }
-
-      req.flash(type, msg);
-      res.redirect("/");
-    }
-  );
-});
+/**
+ * @swagger
+ * paths:
+ *  /auth/register/resident:
+ *    post:
+ *      summary: "입주민 회원가입 시도"
+ *      description: "입주민 회원가입 폼 제출"
+ *      tags: [Auth]
+ *      responses:
+ *        "200":
+ *          description: 입주민 회원가입 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                    ok:
+ *                      type: boolean
+ *                    users:
+ *                      type: object
+ */
+router.post("/register/resident", authController.registerResident);
 
 /**
  * @swagger
@@ -195,6 +144,7 @@ router.get("/verify-email", function (req, res, next) {
  *                      type: object
  */
 router.get("/register/agent", authController.registerAgentView);
+
 /**
  * @swagger
  * paths:
@@ -221,14 +171,14 @@ router.post("/register/agent", authController.registerAgent);
 /**
  * @swagger
  * paths:
- *  /auth/register/resident:
+ *  /auth/register/agent/phoneNumber:
  *    get:
- *      summary: "입주민 회원가입 시도"
- *      description: "입주민 회원가입 폼 제출"
- *      tags: [Auth]
+ *      summary: "공인중개사 회원 가입 시 공공데이터의 전화번호 조회"
+ *      description: "공인중개사 회원 가입 시 DB에 저장된 서울시 부동산 공공데이터 중 ra_regno에 해당하는 전화번호 조회"
+ *      tags: [Agent]
  *      responses:
  *        "200":
- *          description: 입주민 회원가입 성공
+ *          description: 전화번호 조회 성공
  *          content:
  *            application/json:
  *              schema:
@@ -239,29 +189,7 @@ router.post("/register/agent", authController.registerAgent);
  *                    users:
  *                      type: object
  */
-router.get("/register/resident", authController.registerResidentView);
-/**
- * @swagger
- * paths:
- *  /auth/register/resident:
- *    post:
- *      summary: "입주민 회원가입 시도"
- *      description: "입주민 회원가입 폼 제출"
- *      tags: [Auth]
- *      responses:
- *        "200":
- *          description: 입주민 회원가입 성공
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                    ok:
- *                      type: boolean
- *                    users:
- *                      type: object
- */
-router.post("/register/resident", authController.registerResident);
+router.get("/register/agent/phoneNumber/:ra_regno", authController.getAgentPhoneNumber);
 
 /**
  * @swagger
