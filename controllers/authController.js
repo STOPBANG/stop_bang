@@ -134,7 +134,7 @@ module.exports = {
     const getOptions = {
       host: 'stop_bang_register',
       port: process.env.MS_PORT,
-      path: `/register/agent/phoneNumber/${ra_regno}`,
+      path: `/phoneNumber/${ra_regno}`,
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

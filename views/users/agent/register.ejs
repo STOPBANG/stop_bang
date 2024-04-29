@@ -146,10 +146,9 @@
     const raRegnoElement = document.getElementById("agentList_ra_regno");
 
     const response = await fetch(
-      `/agent/phoneNumber?raRegno=${raRegnoElement.value}`
+      `/auth/phoneNumber?raRegno=${raRegnoElement.value}`
     );
     const result = await response.json();
-    console.log(`${result}`)
     if (!result.phoneNumber)
       return alert("Failed to get a phone number of agent");
 
