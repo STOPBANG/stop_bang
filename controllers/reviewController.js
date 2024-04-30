@@ -3,6 +3,8 @@ const reviewModel = require("../models/reviewModel.js");
 const tags = require("../public/assets/tag.js");
 const jwt = require("jsonwebtoken");
 const {httpRequest} = require("../utils/httpRequest.js");
+const http = require('http');
+const { title } = require("process");
 
 module.exports = {
   //후기 추가
@@ -59,37 +61,80 @@ module.exports = {
       });
   },
 
-  //후기 수정
-  updateReview: (req, res) => {
-    reviewModel.getReviewByRvId(req.params, (residentReview) => {
-      let cmpName = residentReview.cmp_nm;
-      let userName = residentReview.r_username;
-      let raRegno = residentReview.ra_regno;
-      let rate = residentReview.rating;
-      let description = residentReview.content;
-      let updatedTime = residentReview.check_point;
-      console.log(updatedTime);
-      let checkedTags = residentReview.tags;
 
-      let title = `${cmpName} - ${userName}님의 후기 수정하기`;
-      res.render("review/updateReview.ejs", {
-        title: title,
-        reviewId: req.params.rv_id,
-        raRegno: raRegno,
-        rate: rate,
-        description: description,
-        userName: userName,
-        updatedTime: updatedTime,
-        checkedTags: checkedTags,
-        tagsdata: tags.tags,
+  updateReview: async (req, res) => {
+    const username = res.locals.auth;
+    let title;
+
+    /* msa */
+    const getOptionsReview = {
+      host: 'stop_bang_review_DB',
+      port: process.env.MS_PORT,
+      path: `/db/review/findAllByReviewId/${req.params.rv_id}`,
+      method: 'GET',
+      headers: {
+        ...req.headers,
+        auth: res.locals.auth
+      }
+    };
+
+    const forwardRequestReview = http.request ( 
+      getOptionsReview,
+      forwardResponse => {
+        let data='';
+        forwardResponse.on('data', async chunk => {
+          data += chunk;
+          
+          const ra_regno = JSON.parse(chunk)[0].agentList_ra_regno;
+
+          const apiResponse = await fetch(
+          `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/landBizInfo/1/1/${ra_regno}`
+        );
+        const js = await apiResponse.json();
+        const cmp_nm = js.landBizInfo.row[0].CMP_NM;
+        
+        title = `${cmp_nm} - ${username}님의 후기 수정하기`;
+      });
+      forwardResponse.on('end', () => {
+        return res.render("review/updateReview",{
+          review: JSON.parse(data)[0],
+          tagsdata:tags.tags,
+          title: title
+        });
       });
     });
+
+    forwardRequestReview.on('close', () => {
+      console.log('Sent [myReview] message to resident_mypage microservice.');
+    });
+    forwardRequestReview.on('error', (err) => {
+      console.log('Failed to send [myReview] message');
+      console.log(err && err.stack || err);
+    });
+
+    req.pipe(forwardRequestReview);
+
   },
+
 
   //후기 수정 DB 반영
   updatingReview: (req, res) => {
-	  reviewModel.updateReviewProcess(req.params, req.body, () => {
-	    res.redirect(`/resident/myReview`);
-	  });
+    /* msa */
+    const postOptions = {
+      host: 'stop_bang_review_DB',
+      port: process.env.MS_PORT,
+      path: `/db/review/update`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+    const requestBody = {
+      ...
+      req.body,
+      rv_id: req.params.rv_id
+    }
+    return httpRequest(postOptions, requestBody)
+    .then(res.redirect(`/resident/myReview`));
   }
 };

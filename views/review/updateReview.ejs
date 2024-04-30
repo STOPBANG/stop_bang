@@ -12,28 +12,28 @@
 
 <div style="padding: 20px 30px;">
   <h3 class="uk-text-lead"><%- title %></h3>
-  <form action='/review/<%- reviewId %>/update_process' method='post'>
+  <form action='/review/<%- review.id %>/update_process' method='post'>
     <div class="uk-text-meta">이미 작성한 후기는 유지되지만 태그와 내용을 추가할 수 있습니다. </div>
-    <input type='hidden' name='raRegno' value=<%- raRegno %>>
-    <input class="uk-input uk-form-blank uk-form-width-medium" type='text' name='updatedTime' readonly value=<%= updatedTime %>>
-    <input id="review-rate" type="hidden" name="rate" value=<%= rate %>>
+    <input type='hidden' name='raRegno' value=<%- review.agentList_ra_regno %>>
+    <input class="uk-input uk-form-blank uk-form-width-medium" type='text' name='updatedTime' readonly value=<%= review.updated_time %>>
+    <input id="review-rate" type="hidden" name="rate" value=<%= review.rating %>>
     <div class="layout-row">
       <% for( let index = 1; index <= 5; index++ ) { %>
-      <% if (index <= rate) { %>
+      <% if (index <= review.rating) { %>
       <span id='review-star<%= index %>' class="highlight" uk-icon="icon: star; ratio:1.5" onclick="onStarClick(<%= index %>)"></span>
       <% } else { %>
       <span id='review-star<%= index %>' class="" uk-icon="icon: star; ratio:1.5" onclick="onStarClick(<%= index %>)"></span>
       <% } %>
       <% } %>
     </div>
-    <input type='hidden' name='checkedTags' value=<%- checkedTags %>>
+    <input type='hidden' name='checkedTags' value=<%- review.tags %>>
     <div id="review-tags" name="reviewtags" class="layout-row checkboxes">
       <% tagsdata.forEach((element, index) => { %>
-      <label><input class="uk-checkbox" type="checkbox" name="tag" value=<%=index %> <% if (checkedTags !== null && checkedTags.split("").toString().indexOf(index) !== -1) { %> disabled checked <% } %>> <%=element %></label>
+      <label><input class="uk-checkbox" type="checkbox" name="tag" value=<%=index %> <% if (review.tags !== null && review.tags.split("").toString().indexOf(index) !== -1) { %> disabled checked <% } %>> <%=element %></label>
       <% }) %>
     </div>
-    <p><textarea name='originDesc' class="uk-textarea uk-form-width-large" readonly><%- description %></textarea></p>
-    <p><textarea name='description' class="uk-textarea uk-form-width-large" rows="3" placeholder='당신의 후기를 추가하세요(이미 작성된 후기는 수정할 수 없습니다.)' maxlength=<%= 200-description.length-updatedTime.length-1 > 0 ? 200-description.length-updatedTime.length-1 : 0 %>></textarea></p>
+    <p><textarea name='originDesc' class="uk-textarea uk-form-width-large" readonly><%- review.content %></textarea></p>
+    <p><textarea name='description' class="uk-textarea uk-form-width-large" rows="3" placeholder='당신의 후기를 추가하세요(이미 작성된 후기는 수정할 수 없습니다.)' maxlength=<%= 200-review.content.length-review.updated_time.length-1 > 0 ? 200-review.content.length-review.updated_time.length-1 : 0 %>></textarea></p>
     <input type='submit' class="user-submit-button uk-button uk-button-default" value='등록'>
   </form>
   <form action='/resident/myReview' method='get'>
