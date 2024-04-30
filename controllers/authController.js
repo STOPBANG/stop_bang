@@ -106,24 +106,26 @@ module.exports = {
       }
     };
 
-    const requestBody = req.body;
-    const request = http.request(
-      postOptions,
-      forwardResponse => {
-        res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
-        forwardResponse.pipe(res);
-      }
+    const forwardRequest = http.request(
+        postOptions,
+        forwardResponse => {
+          console.log("authController 복귀");
+          res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+          forwardResponse.pipe(res);
+        }
     );
-    request.on('close', () => {
-      console.log('Sent message to microservice.');
-      res.redirect("/");
+
+    forwardRequest.on('close', () => {
+      console.log('Sent [registerAgent] message to register microservice.');
     });
-    request.on('error', (err) => {
-      console.log('Failed to send message');
+
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [registerAgent] message');
       console.log(err && err.stack || err);
     });
-    request.write(JSON.stringify(requestBody));
-    request.end();
+
+    forwardRequest.write(JSON.stringify(req.body));
+    forwardRequest.end();
   },
 
   getAgentPhoneNumber: async (req, res) => {
