@@ -11,7 +11,7 @@ module.exports = {
   getAgency: async (req, res) => {
     const { sgg_nm, bjdong_nm } = req.query;
     const getOptions = {
-      host: 'stop_bang_map_page',
+      host: 'stop_bang_map',
       port: process.env.MS_PORT,
       path: `/search/agencies`,
       method: 'GET',
@@ -36,7 +36,7 @@ module.exports = {
     const cmp_nm = '%'+req.query.cmp_nm+'%';
     
     const getOptions = {
-      host: 'stop_bang_map_page',
+      host: 'stop_bang_map',
       port: process.env.MS_PORT,
       path: `/search/agencyName`,
       method: 'GET',
