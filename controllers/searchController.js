@@ -21,7 +21,7 @@ module.exports = {
         'Content-Type': 'application/json',
       }
     }
-    requestBody = { sgg_nm: sgg_nm, bjdong_nm: bjdong_nm };
+    let requestBody = { sgg_nm: sgg_nm, bjdong_nm: bjdong_nm };
 
     httpRequest(getOptions, requestBody)
     .then((response) => {
@@ -46,8 +46,7 @@ module.exports = {
         'Content-Type': 'application/json',
       }    
     }
-
-    requestBody = { sgg_nm: sgg_nm, bjdong_nm: bjdong_nm, cmp_nm : cmp_nm };
+    let requestBody = { sgg_nm: sgg_nm, bjdong_nm: bjdong_nm, cmp_nm : cmp_nm };
 
     httpRequest(getOptions, requestBody)
     .then((response) => {
