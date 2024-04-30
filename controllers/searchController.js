@@ -10,11 +10,11 @@ module.exports = {
   // [start] 모든 agency 정보 가져오기
   getAgency: async (req, res) => {
     const { sgg_nm, bjdong_nm } = req.query;
-    const getOptions = {
+    const postOptions = {
       host: 'stop_bang_map',
       port: process.env.MS_PORT,
       path: `/search/agencies`,
-      method: 'GET',
+      method: 'POST',
       headers: {
         ...
         req.headers,
@@ -23,9 +23,9 @@ module.exports = {
     }
     let requestBody = { sgg_nm: sgg_nm, bjdong_nm: bjdong_nm };
 
-    httpRequest(getOptions, requestBody)
-    .then((response) => {
-      return res.json({rows: response.rows});
+    httpRequest(postOptions, requestBody)
+      .then((response) => {
+      return res.json({rows: response.body})
     });
   },
   // [end] 모든 agency 정보 가져오기
@@ -35,11 +35,11 @@ module.exports = {
     const bjdong_nm = req.query.bjdong_nm;
     const cmp_nm = '%'+req.query.cmp_nm+'%';
     
-    const getOptions = {
+    const postOptions = {
       host: 'stop_bang_map',
       port: process.env.MS_PORT,
       path: `/search/agencyName`,
-      method: 'GET',
+      method: 'POST',
       headers: {
         ...
         req.headers,
@@ -48,9 +48,9 @@ module.exports = {
     }
     let requestBody = { sgg_nm: sgg_nm, bjdong_nm: bjdong_nm, cmp_nm : cmp_nm };
 
-    httpRequest(getOptions, requestBody)
+    httpRequest(postOptions, requestBody)
     .then((response) => {
-      return res.json({rows: response.rows});
+      return res.json({rows: response.body});
     });
   }
   // [end] 하나의 agency 정보 가져오기
