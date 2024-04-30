@@ -19,11 +19,11 @@ module.exports = {
         ...
         req.headers,
         'Content-Type': 'application/json',
-      },
-      query: {sgg_nm: sgg_nm, bjdong_nm: bjdong_nm} // 오류 확인
+      }
     }
+    requestBody = { sgg_nm: sgg_nm, bjdong_nm: bjdong_nm };
 
-    httpRequest(getOptions)
+    httpRequest(getOptions, requestBody)
     .then((response) => {
       return res.json({rows: response.rows});
     });
@@ -44,11 +44,12 @@ module.exports = {
         ...
         req.headers,
         'Content-Type': 'application/json',
-      },
-      query: {sgg_nm: sgg_nm, bjdong_nm: bjdong_nm, cmp_nm: cmp_nm} // 오류 확인
+      }    
     }
 
-    httpRequest(getOptions)
+    requestBody = { sgg_nm: sgg_nm, bjdong_nm: bjdong_nm, cmp_nm : cmp_nm };
+
+    httpRequest(getOptions, requestBody)
     .then((response) => {
       return res.json({rows: response.rows});
     });
