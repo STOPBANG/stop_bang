@@ -80,7 +80,6 @@ module.exports = {
     );
     request.on('close', () => {
       console.log('Sent message to microservice.');
-      res.redirect("/");
     });
     request.on('error', (err) => {
       console.log('Failed to send message');
