@@ -14,7 +14,8 @@ module.exports = {
       headers: {
         ...
         req.headers,
-        auth: res.locals.auth
+        auth: res.locals.auth,
+        id: res.locals.id
       }
     }
     const forwardRequest = http.request(
@@ -48,7 +49,8 @@ module.exports = {
       headers: {
         ...
         req.headers,
-        auth: res.locals.auth
+        auth: res.locals.auth,
+        id: res.locals.id
       }
     }
     const forwardRequest = http.request(
@@ -82,7 +84,8 @@ module.exports = {
       headers: {
         ...
         req.headers,
-        auth: res.locals.auth
+        auth: res.locals.auth,
+        id: res.locals.id
       }
     }
     const forwardRequest = http.request(
