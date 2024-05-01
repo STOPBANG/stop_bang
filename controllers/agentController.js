@@ -103,49 +103,65 @@ module.exports = {
 	},
 
   agentProfile: async (req, res, next) => {
-    //쿠키로부터 로그인 계정 알아오기
-    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      try {
-        let agent = await agentModel.getAgentProfile(req.params.id);
-        let getMainInfo = await agentModel.getMainInfo(req.params.id);
-        //다른 공인중개사 페이지 접근 제한(수정제한으로 수정 필요할지도)
-        if (getMainInfo.a_username !== decoded.userId)
-          res.render('notFound.ejs', {message: "접근이 제한되었습니다. 공인중개사 계정으로 로그인하세요"});
-        let getEnteredAgent = await agentModel.getEnteredAgent(req.params.id);
-        let getReviews = await agentModel.getReviewByRaRegno(req.params.id);
-        let getReport = await agentModel.getReport(req.params.id, decoded.userId);
-        let getRating = await agentModel.getRating(req.params.id);
-        let statistics = makeStatistics(getReviews);
-        res.locals.agent = agent[0];
-        res.locals.agentMainInfo = getMainInfo;
-        res.locals.agentSubInfo = getEnteredAgent[0][0];
-        res.locals.agentReviewData = getReviews;
-        res.locals.report = getReport;
-        res.locals.statistics = statistics;
-
-        if (getRating === null) {
-          res.locals.agentRating = 0;
-          res.locals.tagsData = null;
-        } else {
-          res.locals.agentRating = getRating;
-          res.locals.tagsData = tags.tags;
+    try {
+      //쿠키로부터 로그인 계정 알아오기
+      if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
+      else {
+        const decoded = jwt.verify(
+          req.cookies.authToken,
+          process.env.JWT_SECRET_KEY
+        );
+        let r_username = decoded.userId;
+        /* msa */
+        const getProfileOptions = {
+          host: 'stop_bang_realtor_page',
+          port: process.env.MS_PORT,
+          path: `/agent/${req.params.ra_regno}`,
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-
-        /* gcs */
-        const profileImage = res.locals.agent.a_profile_image;
-        if(profileImage !== null) {
-          res.locals.agent.a_profile_image = bucket.file(`agent/${profileImage}`).publicUrl();
-        }
-      } catch (err) {
-        console.error(err.stack);
+        httpRequest(getProfileOptions)
+        .then(profileResult => {
+          let agent = profileResult.body[0];
+        })
       }
-      next();
+    
+      // let agent = await agentModel.getAgentProfile(req.params.id);
+      // let getMainInfo = await agentModel.getMainInfo(req.params.id);
+      // //다른 공인중개사 페이지 접근 제한(수정제한으로 수정 필요할지도)
+      // if (getMainInfo.a_username !== decoded.userId)
+      //   res.render('notFound.ejs', {message: "접근이 제한되었습니다. 공인중개사 계정으로 로그인하세요"});
+      // let getEnteredAgent = await agentModel.getEnteredAgent(req.params.id);
+      // let getReviews = await agentModel.getReviewByRaRegno(req.params.id);
+      // let getReport = await agentModel.getReport(req.params.id, decoded.userId);
+      // let getRating = await agentModel.getRating(req.params.id);
+      // let statistics = makeStatistics(getReviews);
+      // res.locals.agent = agent[0];
+      // res.locals.agentMainInfo = getMainInfo;
+      // res.locals.agentSubInfo = getEnteredAgent[0][0];
+      // res.locals.agentReviewData = getReviews;
+      // res.locals.report = getReport;
+      // res.locals.statistics = statistics;
+
+      // if (getRating === null) {
+      //   res.locals.agentRating = 0;
+      //   res.locals.tagsData = null;
+      // } else {
+      //   res.locals.agentRating = getRating;
+      //   res.locals.tagsData = tags.tags;
+      // }
+
+      /* gcs */
+      const profileImage = res.locals.agent.a_profile_image;
+      if(profileImage !== null) {
+        res.locals.agent.a_profile_image = bucket.file(`agent/${profileImage}`).publicUrl();
+      }
+    } catch (err) {
+      console.error(err.stack);
     }
+    next();
   },
 
   agentProfileView: (req, res) => {

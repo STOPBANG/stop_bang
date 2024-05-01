@@ -29,7 +29,6 @@ module.exports = {
         req.headers,
         'Content-Type': 'application/json',
       },
-      body: {r_username: r_username}
     }
 
     httpRequest(getOptions)

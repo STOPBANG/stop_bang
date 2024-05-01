@@ -28,10 +28,12 @@ app.use((req, res, next) => {
     if (decoded.userId == null)
       return res.render('notFound.ejs', {message: "로그인이 필요합니다"});
       res.locals.auth = decoded.userId;
+      res.locals.id = decoded.id;
       res.locals.userType = req.cookies.userType;
       res.locals.is_admin = adminControl.getAdmin(decoded.userId);
   } catch (error) {
     res.locals.auth = "";
+    res.locals.id = "";
     res.locals.userType = "";
     res.locals.is_admin = "";
   }
