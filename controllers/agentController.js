@@ -187,53 +187,71 @@ module.exports = {
   },
 
   updateEnteredInfo: async (req, res) => {
-    let getEnteredAgent = await agentModel.getEnteredAgent(req.params.id);
-
-    let profileImage = getEnteredAgent[0][0].a_profile_image;
-    console.log(getEnteredAgent[0]);
-    let officeHour = getEnteredAgent[0][0].a_office_hours;
-    let hours = officeHour != null ? officeHour.split(' ') : null;
-
-    let title = `부동산 정보 수정하기`;
-    res.render("agent/updateAgentInfo.ejs", {
-      title: title,
-      agentId: req.params.id,
-      profileImage: profileImage,
-      officeHourS: hours != null ? hours[0] : null,
-      officeHourE: hours != null ? hours[2] : null
+    /* msa */
+    const getOptions = {
+      host: 'stop_bang_realtor_page',
+      port: process.env.MS_PORT,
+      path: '/:id/update_process',
+      method: 'GET',
+      headers: {
+        ...
+            req.headers,
+        auth: res.locals.auth
+      }
+    }
+    const forwardRequest = http.request(
+        getOptions,
+        forwardResponse => {
+          let data = '';
+          forwardResponse.on('data', chunk => {
+            data += chunk;
+          });
+          forwardResponse.on('end', () => {
+            return res.render("resident/settings", JSON.parse(data));
+          });
+        }
+    );
+    forwardRequest.on('close', () => {
+      console.log('Sent [updateEnteredInfo] message to realtor_page microservice.');
     });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [updateEnteredInfo] message');
+      console.log(err && err.stack || err);
+    });
+    req.pipe(forwardRequest);
   },
 
-  updatingEnteredInfo: (req, res, next) => {
-    try {
-      let filename = '';
-      /* gcs */
-      if(req.file) {
-        const date = new Date();
-        const fileTime = date.getTime();
-        filename = `${fileTime}-${req.file.originalname}`;
-        const gcsFileDir = `agent/${filename}`;
-        // gcs에 agent 폴더 밑에 파일이 저장
-        const blob = bucket.file(gcsFileDir);
-        const blobStream = blob.createWriteStream();
-
-        blobStream.on('finish', () => {
-          console.log('gcs upload successed');
-        });
-
-        blobStream.on('error', (err) => {
-          console.log(err);
-        });
-
-        blobStream.end(req.file.buffer);
+  updatingEnteredInfo: (req, res) => {
+    /* msa */
+    const postOptions = {
+      host: 'stop_bang_realtor_page',
+      port: process.env.MS_PORT,
+      path: `/:id/update`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       }
-      req.file.filename = filename;
-      agentModel.updateEnterdAgentInfo(req.params.id, req.file, req.body, () => {
-        res.redirect(`/agent/${req.params.id}`);
-      });
-    } catch(err) {
-      console.log('updating info err : ', err);
-    }
+    };
+
+    const forwardRequest = http.request(
+        postOptions,
+        forwardResponse => {
+          res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+          forwardResponse.pipe(res);
+        }
+    );
+
+    forwardRequest.on('close', () => {
+      console.log('Sent [updatingEnteredInfo] message to realtor_page microservice.');
+    });
+
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [updatingEnteredInfo] message');
+      console.log(err && err.stack || err);
+    });
+
+    forwardRequest.write(JSON.stringify(req.body));
+    forwardRequest.end();
   },
 
   settings: (req, res) => {
