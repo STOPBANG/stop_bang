@@ -105,10 +105,10 @@ module.exports = {
     });
 
     forwardRequestReview.on('close', () => {
-      console.log('Sent [myReview] message to resident_mypage microservice.');
+      console.log('Sent [Review] message to review_db microservice.');
     });
     forwardRequestReview.on('error', (err) => {
-      console.log('Failed to send [myReview] message');
+      console.log('Failed to send [Review] message');
       console.log(err && err.stack || err);
     });
 
