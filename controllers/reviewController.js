@@ -64,7 +64,6 @@ module.exports = {
 
   updateReview: async (req, res) => {
     const username = res.locals.auth;
-    let title;
 
     /* msa */
     const getOptionsReview = {
@@ -80,28 +79,28 @@ module.exports = {
 
     const forwardRequestReview = http.request ( 
       getOptionsReview,
-      forwardResponse => {
+      async forwardResponse => {
         let data='';
         forwardResponse.on('data', async chunk => {
           data += chunk;
-          
-          const ra_regno = JSON.parse(chunk)[0].agentList_ra_regno;
+
+          const ra_regno = JSON.parse(data)[0].agentList_ra_regno;    
 
           const apiResponse = await fetch(
-          `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/landBizInfo/1/1/${ra_regno}`
-        );
-        const js = await apiResponse.json();
-        const cmp_nm = js.landBizInfo.row[0].CMP_NM;
+            `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/landBizInfo/1/1/${ra_regno}`
+          );
+          const js = await apiResponse.json();
         
-        title = `${cmp_nm} - ${username}님의 후기 수정하기`;
+          const cmp_nm = js.landBizInfo.row[0].CMP_NM;
+          const title = `${cmp_nm} - ${username}님의 후기 수정하기`;
+
+          return res.render("review/updateReview",{
+            review: JSON.parse(data)[0],
+            tagsdata:tags.tags,
+            title: title
+          });
       });
-      forwardResponse.on('end', () => {
-        return res.render("review/updateReview",{
-          review: JSON.parse(data)[0],
-          tagsdata:tags.tags,
-          title: title
-        });
-      });
+
     });
 
     forwardRequestReview.on('close', () => {
@@ -136,5 +135,6 @@ module.exports = {
     }
     return httpRequest(postOptions, requestBody)
     .then(res.redirect(`/resident/myReview`));
-  }
-};
+  },
+
+}
