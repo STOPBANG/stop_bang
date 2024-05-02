@@ -202,12 +202,13 @@ module.exports = {
     });
   },
 
+  // 부동산 홈페이지 영업시간, 전화번호 수정 페이지 렌더링
   updateEnteredInfo: async (req, res) => {
     /* msa */
     const getOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: '/:id/update_process',
+      path: `/${req.params.id}/entered_info_process`,
       method: 'GET',
       headers: {
         ...
@@ -237,12 +238,13 @@ module.exports = {
     req.pipe(forwardRequest);
   },
 
+  // 부동산 홈페이지 영업시간, 전화번호 수정 사항 저장
   updatingEnteredInfo: (req, res) => {
     /* msa */
     const postOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: `/:id/update`,
+      path: `/${req.params.id}/entered_info_update`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
