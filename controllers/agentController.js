@@ -124,7 +124,7 @@ module.exports = {
         }
         httpRequest(getProfileOptions)
         .then(profileResult => {
-          let agent = profileResult.body[0];
+          return res.render("agent/agentIndex", profileResult.body);
         })
       }
     
@@ -152,20 +152,9 @@ module.exports = {
       //   res.locals.agentRating = getRating;
       //   res.locals.tagsData = tags.tags;
       // }
-
-      /* gcs */
-      const profileImage = res.locals.agent.a_profile_image;
-      if(profileImage !== null) {
-        res.locals.agent.a_profile_image = bucket.file(`agent/${profileImage}`).publicUrl();
-      }
     } catch (err) {
       console.error(err.stack);
     }
-    next();
-  },
-
-  agentProfileView: (req, res) => {
-    res.render("agent/agentIndex");
   },
 
   updateMainInfo: async (req, res) => {
