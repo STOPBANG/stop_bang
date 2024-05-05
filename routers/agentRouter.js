@@ -132,9 +132,8 @@ router.post(
 // [msa] agent_page
 //agent 홈 get
 router.get(
-  "/:id",
+  "/:ra_regno",
   agentController.agentProfile,
-  agentController.agentProfileView
 );
 
 /**
