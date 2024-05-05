@@ -4,7 +4,7 @@
     <tr>
         <th>영업시간</th>
         <td>
-            <% if(agent.a_id === null) { %>
+            <% if(agent.id === null) { %>
             <p>정보없음</p>
             <% } else { %>
                 <%= agent.a_office_hours %>
@@ -21,7 +21,7 @@
         <th>공인중개사 연락처</th>
         <td>
             <% if(agent.contact_number === null) { %>
-                <% if(agent.a_id === null) { %> 
+                <% if(agent.id === null) { %> 
                     <%= agent.telno%>
                 <% } else {%>
                     <%= agent.a_phone%>
