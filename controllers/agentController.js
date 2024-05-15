@@ -188,6 +188,8 @@ module.exports = {
       process.env.JWT_SECRET_KEY
     );
 
+    console.log(req.file);
+
     const postUpdatingMainInfoOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
@@ -199,7 +201,7 @@ module.exports = {
         auth: res.locals.auth
       }
     };
-    let requestBody = { files: req.files, introduction: req.body.introduction, sys_regno: req.body.sys_regno};
+    let requestBody = { files: req.file, introduction: req.body.introduction, sys_regno: req.body.sys_regno};
     httpRequest(postUpdatingMainInfoOptions, requestBody)
     .then(updatingMainInfoResult => {
   
