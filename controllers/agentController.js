@@ -84,44 +84,44 @@ module.exports = {
     return res.json(result.body);
   },
 
-    //후기 신고
-    reporting: async (req, res) => {
-      //쿠키로부터 로그인 계정 알아오기
-      if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-      else {
-        try {
-          const decoded = jwt.verify(
-            req.cookies.authToken,
-            process.env.JWT_SECRET_KEY
-          );
-          let a_id = decoded.userId;
-          if(a_id === null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-          ra_regno = await agentModel.reportProcess(req, a_id);
-          //
-          const rv_id = req.params.rv_id;
-          /* msa */
-          const postOptions = {
-            host: 'stop_bang_bookmark',
-            port: process.env.MS_PORT,
-            path: `/agent/report`,
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...req.headers,
-            }
+  //후기 신고
+  reporting: async (req, res) => {
+    //쿠키로부터 로그인 계정 알아오기
+    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
+    else {
+      try {
+        const decoded = jwt.verify(
+          req.cookies.authToken,
+          process.env.JWT_SECRET_KEY
+        );
+        let a_id = decoded.userId;
+        if(a_id === null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
+        ra_regno = await agentModel.reportProcess(req, a_id);
+        //
+        const rv_id = req.params.rv_id;
+        /* msa */
+        const postOptions = {
+          host: 'stop_bang_bookmark',
+          port: process.env.MS_PORT,
+          path: `/agent/report`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...req.headers,
           }
-          let requestBody = { rv_id: rv_id, a_id: a_id };
-          // httpRequest 함수의 반환값을 기다림
-          const response = await httpRequest(postOptions, requestBody);
-          const agentList_ra_regno = response.body;
-          console.log("신고완료");
-          res.redirect(`${req.baseUrl}/${agentList_ra_regno}`);
-        } catch (error) {
-          console.error(error);
-          res.render('error.ejs', {message: "신고 처리 중 오류가 발생했습니다."});
         }
+        let requestBody = { rv_id: rv_id, a_id: a_id };
+        // httpRequest 함수의 반환값을 기다림
+        const response = await httpRequest(postOptions, requestBody);
+        const agentList_ra_regno = response.body;
+        console.log("신고완료");
+        res.redirect(`${req.baseUrl}/${agentList_ra_regno}`);
+      } catch (error) {
+        console.error(error);
+        res.render('error.ejs', {message: "신고 처리 중 오류가 발생했습니다."});
       }
-    },
+    }
+  },
   
   agentProfile: async (req, res, next) => {
     try {
