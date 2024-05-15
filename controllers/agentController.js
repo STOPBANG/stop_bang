@@ -199,16 +199,49 @@ module.exports = {
   },
 
   updatingMainInfo: (req, res, next) => {
-    agentModel.updateMainInfo(req.params.id, req.files, req.body, () => {
-      if (res === null) {
+    /* msa */
+    const decoded = jwt.verify(
+      req.cookies.authToken,
+      process.env.JWT_SECRET_KEY
+    );
+
+    console.log(req.body);
+
+    const postUpdatingMainInfoOptions = {
+      host: 'stop_bang_realtor_page',
+      port: process.env.MS_PORT,
+      path: `/agent/${req.params.agentId}/edit_process`,
+      method: 'POST',
+      headers: {
+        ...
+            req.headers,
+        auth: res.locals.auth
+      }
+    };
+    let requestBody = { files: req.files, introduction: req.body.introduction, sys_regno: req.params.agentId};
+    httpRequest(postUpdatingMainInfoOptions, requestBody)
+    .then(updatingMainInfoResult => {
+  
+      if (updatingMainInfoResult === null) {
         if (error === "imageError") {
-          res.render('notFound.ejs', {message: "이미지 크기가 너무 큽니다. 다른 사이즈로 시도해주세요."})
+          return res.render('notFound.ejs', {message: "이미지 크기가 너무 큽니다. 다른 사이즈로 시도해주세요."})
         }
       } else {
-        res.locals.redirect = `/agent/${req.params.id}`;
+        res.locals.redirect = `/agent/${req.params.agentId}`;
         next();
       }
-    });
+    })
+
+    // agentModel.updateMainInfo(req.params.id, req.files, req.body, () => {
+    //   if (res === null) {
+    //     if (error === "imageError") {
+    //       res.render('notFound.ejs', {message: "이미지 크기가 너무 큽니다. 다른 사이즈로 시도해주세요."})
+    //     }
+    //   } else {
+    //     res.locals.redirect = `/agent/${req.params.id}`;
+    //     next();
+    //   }
+    // });
   },
 
   // 부동산 홈페이지 영업시간, 전화번호 수정 페이지 렌더링
