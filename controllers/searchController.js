@@ -31,9 +31,7 @@ module.exports = {
   // [end] 모든 agency 정보 가져오기
   // [start] 하나의 agency 정보 가져오기
   getOneAgency: async(req, res) => {
-    const sgg_nm = req.query.sgg_nm;
-    const bjdong_nm = req.query.bjdong_nm;
-    const cmp_nm = '%'+req.query.cmp_nm+'%';
+    const { sgg_nm, bjdong_nm, cmp_nm } = req.query;
     
     const postOptions = {
       host: 'stop_bang_map',
