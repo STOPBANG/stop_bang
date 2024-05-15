@@ -223,7 +223,7 @@ router.post(
  *                      type: object
  */
 // [msa] agent_page
-router.get("/:id/info_edit", agentController.updateMainInfo);
+router.get("/:ra_regno/info_edit", agentController.updateMainInfo);
 /**
  * @swagger
  * paths:

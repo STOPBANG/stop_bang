@@ -169,7 +169,7 @@ module.exports = {
     const getUpdateMainInfoOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: `/${req.params.ra_regno}/info_edit`,
+      path: `/agent/${req.params.ra_regno}/info_edit`,
       method: 'GET',
       headers: {
         ...
