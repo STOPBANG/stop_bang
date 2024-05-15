@@ -189,7 +189,7 @@ module.exports = {
 
       return res.render("agent/updateMainInfo.ejs", {
         title: title,
-        agentId: req.params.id,
+        sys_regno: req.params.ra_regno,
         image1: image1,
         image2: image2,
         image3: image3,
