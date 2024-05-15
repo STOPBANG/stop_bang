@@ -188,8 +188,6 @@ module.exports = {
       process.env.JWT_SECRET_KEY
     );
 
-    console.log(req.body);
-
     const postUpdatingMainInfoOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
@@ -214,17 +212,6 @@ module.exports = {
         next();
       }
     })
-
-    // agentModel.updateMainInfo(req.params.id, req.files, req.body, () => {
-    //   if (res === null) {
-    //     if (error === "imageError") {
-    //       res.render('notFound.ejs', {message: "이미지 크기가 너무 큽니다. 다른 사이즈로 시도해주세요."})
-    //     }
-    //   } else {
-    //     res.locals.redirect = `/agent/${req.params.id}`;
-    //     next();
-    //   }
-    // });
   },
 
   // 부동산 홈페이지 영업시간, 전화번호 수정 페이지 렌더링
