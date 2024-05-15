@@ -24,40 +24,26 @@ module.exports = {
 
   //후기 추가 DB 반영
   creatingReview: (req, res) => {
-    const username = res.locals.auth;
-
     /* msa */
-    const postOptionsResident = {
-      host: 'stop_bang_auth_DB',
+    const postOptions = {
+      host: 'stop_bang_review',
       port: process.env.MS_PORT,
-      path: `/db/resident/findById`,
+      path: `/review/${req.params.sys_ra_regno}/create_process`,
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       }
     };
-    const requestBody = {username};
-    httpRequest(postOptionsResident, requestBody)
-      .then(res => {
-        const postOptions = {
-          host: 'stop_bang_review_DB',
-          port: process.env.MS_PORT,
-          path: `/db/review/create`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
-        const requestBody = {
-          ...
-          req.body,
-          r_id: res.body[0].id,
-          ra_regno: req.params.ra_regno,
-        }
-        return httpRequest(postOptions, requestBody);
-      })
+    const requestBody = {
+      ...
+      req.body,
+      username: res.locals.auth,
+      id: res.locals.id,
+    }
+
+    httpRequest(postOptions, requestBody)
       .then(() => {
-        return res.redirect(`/realtor/${req.params.ra_regno}`);
+        return res.redirect(`/realtor/${req.params.sys_ra_regno}`);
       });
   },
 
@@ -137,4 +123,4 @@ module.exports = {
     .then(res.redirect(`/resident/myReview`));
   },
 
-}
+  }
