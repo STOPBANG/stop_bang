@@ -64,7 +64,7 @@ router.post('/:ra_regno/create', reviewController.createReview);
  *                      type: object
  */
 //후기 추가 DB 반영
-router.post('/:ra_regno/create_process', reviewController.creatingReview);
+router.post('/:sys_ra_regno/create_process', reviewController.creatingReview);
 
 /**
  * @swagger
