@@ -26,10 +26,13 @@
     </div>
     <p>이 작성자의 후기 평균: <%- review.avgRRating %></p>
     <% if(tags !== null) { %>
-    <% tags.split("").forEach((element, index) => { %>
-    <span class="uk-label" style="margin-right:5px; margin-bottom:5px;"><%= tagsData[element] %></span>
-    <% }) %>
+      <% tags.split("").forEach((element, index) => { %>
+          <% if(tagsData && tagsData[element]) { %>
+              <span class="uk-label" style="margin-right:5px; margin-bottom:5px;"><%= tagsData[element] %></span>
+          <% } %>
+      <% }) %>
     <% } %>
+  
 
     <% let isMyReview = false; %>
     <% if(review.r_username == r_username) isMyReview = true; %>
