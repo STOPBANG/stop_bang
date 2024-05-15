@@ -24,23 +24,6 @@ const storage = new Storage({
 });
 const bucket = storage.bucket(GCP_BUCKET_NAME);
 
-const makeStatistics = (reviews) => {
-  let array = Array.from({ length: 10 }, () => 0);
-  let stArray = new Array(10);
-  reviews.forEach((review) => {
-    review.tags.split("").forEach((tag) => {
-      array[parseInt(tag)]++;
-    });
-  });
-  for (let index = 0; index < array.length; index++) {
-    stArray[index] = { id: index, tag: tags.tags[index], count: array[index] };
-  }
-  stArray.sort((a, b) => {
-    return b.count - a.count;
-  });
-  return stArray;
-};
-
 // Check File Type
 function checkFileType(file, cb) {
   // Allowed ext
@@ -210,7 +193,7 @@ module.exports = {
     const postUpdatingMainInfoOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: `/agent/${req.params.agentId}/edit_process`,
+      path: `/agent/${req.body.sys_regno}/edit_process`,
       method: 'POST',
       headers: {
         ...
@@ -218,7 +201,7 @@ module.exports = {
         auth: res.locals.auth
       }
     };
-    let requestBody = { files: req.files, introduction: req.body.introduction, sys_regno: req.params.agentId};
+    let requestBody = { files: req.files, introduction: req.body.introduction, sys_regno: req.body.sys_regno};
     httpRequest(postUpdatingMainInfoOptions, requestBody)
     .then(updatingMainInfoResult => {
   
@@ -227,7 +210,7 @@ module.exports = {
           return res.render('notFound.ejs', {message: "이미지 크기가 너무 큽니다. 다른 사이즈로 시도해주세요."})
         }
       } else {
-        res.locals.redirect = `/agent/${req.params.agentId}`;
+        res.locals.redirect = `/agent/${req.body.sys_regno}`;
         next();
       }
     })
