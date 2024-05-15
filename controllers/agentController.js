@@ -1,7 +1,3 @@
-
-
-
-
 //Models
 const agentModel = require("../models/agentModel.js");
 const tags = require("../public/assets/tag.js");
@@ -16,7 +12,6 @@ const http = require('http');
 
 /* msa */
 // gcp bucket
-
 const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID;
 const GCP_KEYFILE_PATH = process.env.GCP_KEYFILE_PATH;
 const GCP_BUCKET_NAME = process.env.GCP_BUCKET_NAME;
@@ -149,16 +144,11 @@ module.exports = {
         }
         httpRequest(getProfileOptions)
         .then(profileResult => {
+          if (profileResult.body.length)
+            return res.render('notFound.ejs', {message: "접근이 제한되었습니다. 공인중개사 계정으로 로그인하세요"});
           return res.render("agent/agentIndex", profileResult.body);
         })
       }
-    
-      // let agent = await agentModel.getAgentProfile(req.params.id);
-      // let getMainInfo = await agentModel.getMainInfo(req.params.id);
-      // //다른 공인중개사 페이지 접근 제한(수정제한으로 수정 필요할지도)
-      // if (getMainInfo.a_username !== decoded.userId)
-      //   res.render('notFound.ejs', {message: "접근이 제한되었습니다. 공인중개사 계정으로 로그인하세요"});
-      // let getEnteredAgent = await agentModel.getEnteredAgent(req.params.id);
       // let getReviews = await agentModel.getReviewByRaRegno(req.params.id);
       // let getReport = await agentModel.getReport(req.params.id, decoded.userId);
       // let getRating = await agentModel.getRating(req.params.id);
@@ -170,13 +160,6 @@ module.exports = {
       // res.locals.report = getReport;
       // res.locals.statistics = statistics;
 
-      // if (getRating === null) {
-      //   res.locals.agentRating = 0;
-      //   res.locals.tagsData = null;
-      // } else {
-      //   res.locals.agentRating = getRating;
-      //   res.locals.tagsData = tags.tags;
-      // }
     } catch (err) {
       console.error(err.stack);
     }
