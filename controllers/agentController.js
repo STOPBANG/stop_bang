@@ -90,8 +90,8 @@ module.exports = {
     if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
     else {
       const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
+          req.cookies.authToken,
+          process.env.JWT_SECRET_KEY
       );
       let a_id = decoded.userId;
       if(a_id === null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
@@ -106,17 +106,17 @@ module.exports = {
         method: 'POST',
         headers: {
           ...
-          req.headers,
+              req.headers,
           'Content-Type': 'application/json',
         }
       }
       let requestBody = { rv_id: rv_id, a_id: a_id };
       const agentList_ra_regno = httpRequest(postOptions, requestBody)
-        .then((response) => {
-          //return res.json({rows: response.body})
-          const agentList_ra_regno = response.body;
-          res.redirect(`${req.baseUrl}/${agentList_ra_regno}`);
-      })
+          .then((response) => {
+            //return res.json({rows: response.body})
+            const agentList_ra_regno = response.body;
+            res.redirect(`${req.baseUrl}/${agentList_ra_regno}`);
+          })
       console.log("신고완료");
       // res.redirect(`${req.baseUrl}/${ra_regno[0][0].agentList_ra_regno}`);
     }
@@ -128,8 +128,8 @@ module.exports = {
       if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
       else {
         const decoded = jwt.verify(
-          req.cookies.authToken,
-          process.env.JWT_SECRET_KEY
+            req.cookies.authToken,
+            process.env.JWT_SECRET_KEY
         );
         // let r_username = decoded.userId;
         /* msa */
@@ -145,11 +145,11 @@ module.exports = {
           }
         }
         httpRequest(getProfileOptions)
-        .then(profileResult => {
-          if (profileResult.body.length)
-            return res.render('notFound.ejs', {message: "접근이 제한되었습니다. 공인중개사 계정으로 로그인하세요"});
-          return res.render("agent/agentIndex", profileResult.body);
-        })
+            .then(profileResult => {
+              if (profileResult.body.length)
+                return res.render('notFound.ejs', {message: "접근이 제한되었습니다. 공인중개사 계정으로 로그인하세요"});
+              return res.render("agent/agentIndex", profileResult.body);
+            })
       }
       // let getReport = await agentModel.getReport(req.params.id, decoded.userId);
       // let getRating = await agentModel.getRating(req.params.id);
@@ -217,7 +217,7 @@ module.exports = {
     const getOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: `/${req.params.id}/entered_info_process`,
+      path: `/realtor/${req.params.id}/entered_info_process`,
       method: 'GET',
       headers: {
         ...
@@ -253,7 +253,7 @@ module.exports = {
     const postOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: `/${req.params.id}/entered_info_update`,
+      path: `/realtor/${req.params.id}/entered_info_update`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -290,24 +290,24 @@ module.exports = {
       method: 'GET',
       headers: {
         ...
-        req.headers,
+            req.headers,
         'Content-Type': 'application/json',
       }
     }
     const forwardRequest = http.request(
-      getOptions,
-      forwardResponse => {
-        let data = '';
-        forwardResponse.on('data', chunk => {
-          data += chunk;
-        });
-        forwardResponse.on('end', () => {
-          const result = JSON.parse(data);
-          if(result.agent === null)
-            return res.render('notFound.ejs', { message: result.message });
-          return res.render("agent/settings", result);
-        });
-      }
+        getOptions,
+        forwardResponse => {
+          let data = '';
+          forwardResponse.on('data', chunk => {
+            data += chunk;
+          });
+          forwardResponse.on('end', () => {
+            const result = JSON.parse(data);
+            if(result.agent === null)
+              return res.render('notFound.ejs', { message: result.message });
+            return res.render("agent/settings", result);
+          });
+        }
     );
     forwardRequest.on('close', () => {
       console.log('Sent [settings] message to agent_mypage microservice.');
@@ -332,23 +332,23 @@ module.exports = {
       }
     }
     const forwardRequest = http.request(
-      postOptions,
-      forwardResponse => {
-        let data = '';
-        forwardResponse.on('data', chunk => {
-          data += chunk;
-        });
-        forwardResponse.on('end', () => {
-          if(forwardResponse.statusCode === 302) { // redirect
-            res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
-            forwardResponse.pipe(res);
-          } else {
-            const result = JSON.parse(data);
-            if(result.message !== null)
-              return res.render('notFound.ejs', { message: result.message });
-          }
-        });
-      }
+        postOptions,
+        forwardResponse => {
+          let data = '';
+          forwardResponse.on('data', chunk => {
+            data += chunk;
+          });
+          forwardResponse.on('end', () => {
+            if(forwardResponse.statusCode === 302) { // redirect
+              res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+              forwardResponse.pipe(res);
+            } else {
+              const result = JSON.parse(data);
+              if(result.message !== null)
+                return res.render('notFound.ejs', { message: result.message });
+            }
+          });
+        }
     );
     forwardRequest.on('close', () => {
       console.log('Sent [updateSettings] message to agent_mypage microservice.');
@@ -373,23 +373,23 @@ module.exports = {
       }
     }
     const forwardRequest = http.request(
-      postOptions,
-      forwardResponse => {
-        let data = '';
-        forwardResponse.on('data', chunk => {
-          data += chunk;
-        });
-        forwardResponse.on('end', () => {
-          if(forwardResponse.statusCode === 302) { // redirect
-            res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
-            forwardResponse.pipe(res);
-          } else {
-            const result = JSON.parse(data);
-            if(result.message !== null)
-              return res.render('notFound.ejs', { message: result.message });
-          }
-        });
-      }
+        postOptions,
+        forwardResponse => {
+          let data = '';
+          forwardResponse.on('data', chunk => {
+            data += chunk;
+          });
+          forwardResponse.on('end', () => {
+            if(forwardResponse.statusCode === 302) { // redirect
+              res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+              forwardResponse.pipe(res);
+            } else {
+              const result = JSON.parse(data);
+              if(result.message !== null)
+                return res.render('notFound.ejs', { message: result.message });
+            }
+          });
+        }
     );
     forwardRequest.on('close', () => {
       console.log('Sent [updatePassword] message to agent_mypage microservice.');
@@ -415,23 +415,23 @@ module.exports = {
       }
     }
     const forwardRequest = http.request(
-      postOptions,
-      forwardResponse => {
-        if(forwardResponse.statusCode === 302) { // redirect
-          res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
-          forwardResponse.pipe(res);
-        } else {
-          let data = '';
-          forwardResponse.on('data', chunk => {
-            data += chunk;
-          });
-          forwardResponse.on('end', () => {
-            const jsonData = JSON.parse(data);
-            if(jsonData.message != null)
-              return res.render('notFound.ejs', jsonData);
-          });
+        postOptions,
+        forwardResponse => {
+          if(forwardResponse.statusCode === 302) { // redirect
+            res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+            forwardResponse.pipe(res);
+          } else {
+            let data = '';
+            forwardResponse.on('data', chunk => {
+              data += chunk;
+            });
+            forwardResponse.on('end', () => {
+              const jsonData = JSON.parse(data);
+              if(jsonData.message != null)
+                return res.render('notFound.ejs', jsonData);
+            });
+          }
         }
-      }
     )
     forwardRequest.on('close', () => {
       console.log('Sent [deleteAccount] message to agent_mypage microservice.');
