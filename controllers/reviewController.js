@@ -53,52 +53,33 @@ module.exports = {
 
     /* msa */
     const getOptionsReview = {
-      host: 'stop_bang_review_DB',
+      host: 'stop_bang_review',
       port: process.env.MS_PORT,
-      path: `/db/review/findAllByReviewId/${req.params.rv_id}`,
+      path: `/review/update/${req.params.rv_id}`,
       method: 'GET',
       headers: {
         ...req.headers,
         auth: res.locals.auth
       }
     };
+    
+    httpRequest(getOptionsReview)
+    .then(async (response) => {
+      const ra_regno=response.body.agentList_ra_regno;
+      const apiResponse = await fetch(
+        `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/landBizInfo/1/1/${ra_regno}`
+      );
+      const js = await apiResponse.json();
+    
+      const cmp_nm = js.landBizInfo.row[0].CMP_NM;
+      const title = `${cmp_nm} - ${username}님의 후기 수정하기`;
 
-    const forwardRequestReview = http.request ( 
-      getOptionsReview,
-      async forwardResponse => {
-        let data='';
-        forwardResponse.on('data', async chunk => {
-          data += chunk;
-
-          const ra_regno = JSON.parse(data)[0].agentList_ra_regno;    
-
-          const apiResponse = await fetch(
-            `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/landBizInfo/1/1/${ra_regno}`
-          );
-          const js = await apiResponse.json();
-        
-          const cmp_nm = js.landBizInfo.row[0].CMP_NM;
-          const title = `${cmp_nm} - ${username}님의 후기 수정하기`;
-
-          return res.render("review/updateReview",{
-            review: JSON.parse(data)[0],
-            tagsdata:tags.tags,
-            title: title
-          });
+      return res.render("review/updateReview",{
+        review: response.body,
+        tagsdata:tags.tags,
+        title: title
       });
-
-    });
-
-    forwardRequestReview.on('close', () => {
-      console.log('Sent [Review] message to review_db microservice.');
-    });
-    forwardRequestReview.on('error', (err) => {
-      console.log('Failed to send [Review] message');
-      console.log(err && err.stack || err);
-    });
-
-    req.pipe(forwardRequestReview);
-
+    })
   },
 
 
