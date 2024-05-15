@@ -4,7 +4,6 @@ const tags = require("../public/assets/tag.js");
 const jwt = require("jsonwebtoken");
 const {httpRequest} = require("../utils/httpRequest.js");
 const http = require('http');
-const { title } = require("process");
 
 module.exports = {
   //후기 추가
@@ -28,7 +27,7 @@ module.exports = {
     const postOptions = {
       host: 'stop_bang_review',
       port: process.env.MS_PORT,
-      path: `/review/${req.params.sys_ra_regno}/create_process`,
+      path: `/review/create_process/${req.params.sys_ra_regno}`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -84,24 +83,20 @@ module.exports = {
 
 
   //후기 수정 DB 반영
-  updatingReview: (req, res) => {
+  updatingReview: async (req, res) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_review_DB',
+      host: 'stop_bang_review',
       port: process.env.MS_PORT,
-      path: `/db/review/update`,
+      path: `/review/update_process/${req.params.rv_id}`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
     }
-    const requestBody = {
-      ...
-      req.body,
-      rv_id: req.params.rv_id
-    }
-    return httpRequest(postOptions, requestBody)
-    .then(res.redirect(`/resident/myReview`));
+
+    await httpRequest(postOptions, req.body);
+    res.redirect(`/resident/myReview`);
   },
 
   }
