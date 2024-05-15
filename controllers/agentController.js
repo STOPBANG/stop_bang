@@ -151,34 +151,43 @@ module.exports = {
           return res.render("agent/agentIndex", profileResult.body);
         })
       }
-      // let getReviews = await agentModel.getReviewByRaRegno(req.params.id);
       // let getReport = await agentModel.getReport(req.params.id, decoded.userId);
       // let getRating = await agentModel.getRating(req.params.id);
-      // let statistics = makeStatistics(getReviews);
-      // res.locals.agent = agent[0];
-      // res.locals.agentMainInfo = getMainInfo;
-      // res.locals.agentSubInfo = getEnteredAgent[0][0];
-      // res.locals.agentReviewData = getReviews;
       // res.locals.report = getReport;
-      // res.locals.statistics = statistics;
-
     } catch (err) {
       console.error(err.stack);
     }
   },
 
   updateMainInfo: async (req, res) => {
-    let getMainInfo = await agentModel.getMainInfo(req.params.id);
+    const decoded = jwt.verify(
+      req.cookies.authToken,
+      process.env.JWT_SECRET_KEY
+    );
 
-    let image1 = getMainInfo.a_image1;
-    let image2 = getMainInfo.a_image2;
-    let image3 = getMainInfo.a_image3;
-    let introduction = getMainInfo.a_introduction;
-
-    //여기가 문제같음...........내일 가서 model쪽이랑 여기 물어보자
+    /* msa */
+    const getUpdateMainInfoOptions = {
+      host: 'stop_bang_realtor_page',
+      port: process.env.MS_PORT,
+      path: `/${req.params.ra_regno}/info_edit`,
+      method: 'GET',
+      headers: {
+        ...
+            req.headers,
+        auth: res.locals.auth
+      }
+    }
+    httpRequest(getUpdateMainInfoOptions)
+    .then(updateMainInfoResult => {
+  
+      let image1 = updateMainInfoResult.body.a_image1;
+      let image2 = updateMainInfoResult.body.a_image2;
+      let image3 = updateMainInfoResult.body.a_image3;
+      let introduction = updateMainInfoResult.body.a_introduction;
 
       let title = `소개글 수정하기`;
-      res.render("agent/updateMainInfo.ejs", {
+
+      return res.render("agent/updateMainInfo.ejs", {
         title: title,
         agentId: req.params.id,
         image1: image1,
@@ -186,6 +195,7 @@ module.exports = {
         image3: image3,
         introduction: introduction,
       });
+    })
   },
 
   updatingMainInfo: (req, res, next) => {
