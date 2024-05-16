@@ -139,18 +139,18 @@ router.get(
 /**
  * @swagger
  * paths:
- *  /agent/{id}/update:
+ *  /agent/{ra_regno}/update:
  *    parameters:
  *      - in: path
  *        name: id
  *        required: true
  *    get:
- *      summary: "부동산 홈페이지 영업시간, 전화번호 수정 페이지"
- *      description: "부동산 홈페이지 영업시간, 전화번호 수정 페이지 렌더링"
+ *      summary: "부동산 홈페이지 영업시간, 프로필 사진 수정 페이지"
+ *      description: "부동산 홈페이지 영업시간, 프로필 사진페이지 렌더링"
  *      tags: [Agent]
  *      responses:
  *        "200":
- *          description: 부동산 홈페이지 영업시간, 전화번호 수정 페이지 렌더링 성공
+ *          description: 부동산 홈페이지 영업시간, 프로필 사진 수정 페이지 렌더링 성공
  *          content:
  *            application/json:
  *              schema:
@@ -161,25 +161,24 @@ router.get(
  *                    users:
  *                      type: object
  */
-// [msa] agent_page
-//agent info 수정(영업시간,전화번호)
-router.get("/:id/update", agentController.updateEnteredInfo);
+// [msa] updateAgentInfo 페이지 랜더링
+router.get("/:ra_regno/update", agentController.updateEnteredInfo);
 
 /**
  * @swagger
  * paths:
- *  /agent/{id}/update_process:
+ *  /agent/{ra_regno}/update_process:
  *    parameters:
  *      - in: path
  *        name: id
  *        required: true
  *    post:
- *      summary: "부동산 홈페이지 영업시간, 전화번호 수정 사항 저장"
- *      description: "부동산 홈페이지 영업시간, 전화번호 수정 사항 저장"
+ *      summary: "부동산 홈페이지 영업시간, 프로필 사진 수정 사항 저장"
+ *      description: "부동산 홈페이지 영업시간, 프로필 사진 수정 사항 저장"
  *      tags: [Agent]
  *      responses:
  *        "200":
- *          description: 부동산 홈페이지 영업시간, 전화번호 수정 사항 저장 성공
+ *          description: 부동산 홈페이지 영업시간, 프로필 사진 수정 사항 저장 성공
  *          content:
  *            application/json:
  *              schema:
@@ -190,9 +189,9 @@ router.get("/:id/update", agentController.updateEnteredInfo);
  *                    users:
  *                      type: object
  */
-// [msa] agent_page
+// [msa] updateAgentInfo 페이지 랜더링
 router.post(
-  "/:id/update_process",
+  "/:ra_regno/update_process",
   agentController.upload.single("myImage"),
   agentController.updatingEnteredInfo,
 );
