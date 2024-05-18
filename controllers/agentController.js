@@ -188,7 +188,38 @@ module.exports = {
       process.env.JWT_SECRET_KEY
     );
 
-    console.log(req.file);
+    let file_arr = [];
+    if(req.files.myImage1) file_arr[0] = req.files.myImage1[0];
+    if(req.files.myImage2) file_arr[1] = req.files.myImage2[0];
+    if(req.files.myImage3) file_arr[2] = req.files.myImage3[0];
+    // console.log(req.files.myImage2);
+
+    console.log(file_arr);
+
+    let filename = '';
+  
+    /* gcs */
+    for(file of file_arr){
+      const date = new Date();
+      const fileTime = date.getTime();
+      filename = `${fileTime}-${file.originalname}-image$`;
+      console.log(filename);
+      const gcsFileDir = `agent/${filename}`;
+      // gcs에 agent 폴더 밑에 파일이 저장
+      const blob = bucket.file(gcsFileDir);
+      const blobStream = blob.createWriteStream();
+
+      blobStream.on('finish', () => {
+      console.log('gcs upload successed');
+      });
+
+      blobStream.on('error', (err) => {
+      console.log(err);
+      });
+
+      blobStream.end(file.buffer);
+      req.body.files = filename;
+  }
 
     const postUpdatingMainInfoOptions = {
       host: 'stop_bang_realtor_page',
@@ -201,7 +232,7 @@ module.exports = {
         auth: res.locals.auth
       }
     };
-    let requestBody = { files: req.file, introduction: req.body.introduction, sys_regno: req.body.sys_regno};
+    let requestBody = { files: req.files, introduction: req.body.introduction, sys_regno: req.body.sys_regno};
     httpRequest(postUpdatingMainInfoOptions, requestBody)
     .then(updatingMainInfoResult => {
   
@@ -218,16 +249,11 @@ module.exports = {
 
   // 부동산 홈페이지 영업시간, 전화번호 수정 페이지 렌더링
   updateEnteredInfo: async (req, res) => {
-    const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-    );
-
     /* msa */
     const getOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: `/agent/${req.params.ra_regno}/entered_info_process`,
+      path: `/realtor/${req.params.id}/entered_info_process`,
       method: 'GET',
       headers: {
         ...
@@ -235,20 +261,26 @@ module.exports = {
         auth: res.locals.auth
       }
     }
-    httpRequest(getOptions)
-        .then(updateEnteredInfoResult => {
-
-          let title = `부동산 정보 수정`;
-          let officeHourS = updateEnteredInfoResult.body.a_office_hours;
-          let officeHourE = officeHourS != null ? officeHourS.split(' ') : null;
-
-          return res.render("agent/updateAgentInfo.ejs", {
-            title: title,
-            agentId: req.params.ra_regno,
-            officeHourS: officeHourS,
-            officeHourE: officeHourE,
+    const forwardRequest = http.request(
+        getOptions,
+        forwardResponse => {
+          let data = '';
+          forwardResponse.on('data', chunk => {
+            data += chunk;
           });
-        })
+          forwardResponse.on('end', () => {
+            return res.render("resident/settings", JSON.parse(data));
+          });
+        }
+    );
+    forwardRequest.on('close', () => {
+      console.log('Sent [updateEnteredInfo] message to realtor_page microservice.');
+    });
+    forwardRequest.on('error', (err) => {
+      console.log('Failed to send [updateEnteredInfo] message');
+      console.log(err && err.stack || err);
+    });
+    req.pipe(forwardRequest);
   },
 
   // 부동산 홈페이지 영업시간, 전화번호 수정 사항 저장
@@ -257,7 +289,7 @@ module.exports = {
     const postOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: `/agent/${req.params.ra_regno}/entered_info_update`,
+      path: `/realtor/${req.params.id}/entered_info_update`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
