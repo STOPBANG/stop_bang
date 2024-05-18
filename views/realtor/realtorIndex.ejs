@@ -59,7 +59,7 @@
     <% } else { %>
     <% review.forEach(review => { %>
     <% if(review.check_repo === 0) { %>
-      <%- include('./realtorReview.ejs', {r_username: r_username, review: review, report: report, opened: openedReviewData, canOpen: canOpen, who: who, tags: review.tags, tagsData: tagsData}); %>
+      <%- include('./realtorReview.ejs', {r_username: review.username, review: review, report: report, opened: openedReviewData, canOpen: canOpen, who: who, tags: review.tags, tagsData: tagsData}); %>
       <% } else { %>
       <%- include('./realtorRepoReview.ejs', {review: review}); %>
       <% } %>
