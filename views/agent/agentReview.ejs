@@ -25,11 +25,11 @@
 		<% } %>
 	  </div>
 	  <!--태그넣을 곳-->
-	  <p>이 작성자의 후기 평균: <%- review.avgRRating %></p>
+	  <p>이 작성자의 후기 평균: <%- review.rating %></p>
 		<% if(tags !== null) { %>
-			<% tags.split("").forEach((element, index) => { %>
-			<span class="uk-label" style="margin-right:5px; margin-bottom:5px;"><%= tagsData[element] %></span>
-			<% }) %>
+			<% if(tagsData && tagsData[element]) { %>
+				<span class="uk-label" style="margin-right:5px; margin-bottom:5px;"><%= tagsData[element] %></span>
+			<% } %>
 		<% } %>
 		<p class="rv-content"><%- review.content %></p>
 	</span>
