@@ -188,6 +188,39 @@ module.exports = {
       process.env.JWT_SECRET_KEY
     );
 
+    let file_arr = [];
+    if(req.files.myImage1) file_arr[0] = req.files.myImage1[0];
+    if(req.files.myImage2) file_arr[1] = req.files.myImage2[0];
+    if(req.files.myImage3) file_arr[2] = req.files.myImage3[0];
+    // console.log(req.files.myImage2);
+
+    console.log(file_arr);
+
+    let filename = '';
+  
+    /* gcs */
+    for(file of file_arr){
+      const date = new Date();
+      const fileTime = date.getTime();
+      filename = `${fileTime}-${file.originalname}-image$`;
+      console.log(filename);
+      const gcsFileDir = `agent/${filename}`;
+      // gcs에 agent 폴더 밑에 파일이 저장
+      const blob = bucket.file(gcsFileDir);
+      const blobStream = blob.createWriteStream();
+
+      blobStream.on('finish', () => {
+      console.log('gcs upload successed');
+      });
+
+      blobStream.on('error', (err) => {
+      console.log(err);
+      });
+
+      blobStream.end(file.buffer);
+      req.body.files = filename;
+  }
+
     const postUpdatingMainInfoOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
