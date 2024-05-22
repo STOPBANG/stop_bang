@@ -8,17 +8,40 @@ const http = require('http');
 module.exports = {
   //후기 추가
   createReview: async (req, res) => {
-    // 서울시 공공데이터 api
-    const apiResponse = await fetch(
-      `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/landBizInfo/1/1/${req.params.ra_regno}`
-    );
-    const js = await apiResponse.json();
-    const agentPublicData = js.landBizInfo.row[0];
+    console.log(req.params.sys_regno);
+    const postOptions = {
+      host: 'stop_bang_review',
+      port: process.env.MS_PORT,
+      path: `/review/create/${req.params.sys_regno}`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        id: res.locals.id
+      }
+    };
 
-    res.render("review/writeReview.ejs", {
-      realtor: agentPublicData,
-      tagsdata: tags.tags,
-    });
+    await httpRequest(postOptions)
+      .then(async (response) => {
+        if(response.body.length >= 1){
+          // 작성한 리뷰가 있을 때
+          res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
+          res.write("<script>alert('이미 후기를 작성한 부동산입니다.')</script>");
+          res.write(`<script>window.location=\"../../realtor/${req.params.sys_regno}\"</script>`);
+        }
+        else {
+          // 서울시 공공데이터 api
+          const apiResponse = await fetch(
+            `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/landBizInfo/1/1/${req.params.sys_regno}`
+          );
+          const js = await apiResponse.json();
+          const agentPublicData = js.landBizInfo.row[0];
+
+          res.render("review/writeReview.ejs", {
+            realtor: agentPublicData,
+            tagsdata: tags.tags,
+          });
+       }
+      });
   },
 
   //후기 추가 DB 반영
@@ -27,7 +50,7 @@ module.exports = {
     const postOptions = {
       host: 'stop_bang_review',
       port: process.env.MS_PORT,
-      path: `/review/create_process/${req.params.sys_ra_regno}`,
+      path: `/review/create_process/${req.params.sys_regno}`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -42,7 +65,7 @@ module.exports = {
 
     httpRequest(postOptions, requestBody)
       .then(() => {
-        return res.redirect(`/realtor/${req.params.sys_ra_regno}`);
+        return res.redirect(`/realtor/${req.params.sys_regno}`);
       });
   },
 
