@@ -36,7 +36,7 @@ router.use((req, res, next) => {
  */
 //(후기 작성하고 휴지 받기) 버튼 눌렀을 때
 //후기 추가
-router.post('/:ra_regno/create', reviewController.createReview);
+router.post('/:sys_regno/create', reviewController.createReview);
 
 /**
  * @swagger
@@ -64,7 +64,7 @@ router.post('/:ra_regno/create', reviewController.createReview);
  *                      type: object
  */
 //후기 추가 DB 반영
-router.post('/:sys_ra_regno/create_process', reviewController.creatingReview);
+router.post('/:sys_regno/create_process', reviewController.creatingReview);
 
 /**
  * @swagger
