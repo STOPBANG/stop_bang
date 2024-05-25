@@ -282,7 +282,7 @@ router.post(
  */
 // [msa] review
 //후기 신고
-router.get('/report/:rv_id', agentController.reporting);
+router.get('/report/:rv_id/:reason', agentController.reporting);
 
 /**
  * @swagger
