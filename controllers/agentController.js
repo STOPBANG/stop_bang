@@ -83,7 +83,6 @@ module.exports = {
         if(a_id === null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
         
         const { rv_id, reason } = req.params;
-        console.log("rv_id / reason: ", rv_id, reason);
 
         /* msa */
         const postOptions = {
@@ -100,11 +99,9 @@ module.exports = {
 
         let requestBody = { rv_id: rv_id, a_id: a_id, reason: reason };
         const response = await httpRequest(postOptions, requestBody);
-        // console.log("(main)Response.body: ", response.body);
         res.redirect(`${req.baseUrl}/${response.body}`);
         console.log("신고완료");
       }
-      // res.redirect(`${req.baseUrl}/${ra_regno[0][0].agentList_ra_regno}`);
     } catch (error) {
         console.error(error);
         res.render('notFound.ejs', { message: "main: reporting error" });
