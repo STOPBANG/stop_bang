@@ -119,7 +119,7 @@ module.exports = {
         const getProfileOptions = {
           host: 'stop_bang_realtor_page',
           port: process.env.MS_PORT,
-          path: `/agent/${req.params.ra_regno}`,
+          path: `/agent/${req.params.sys_regno}`,
           method: 'GET',
           headers: {
             ...
@@ -152,7 +152,7 @@ module.exports = {
     const getUpdateMainInfoOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: `/agent/${req.params.ra_regno}/info_edit`,
+      path: `/agent/${req.params.sys_regno}/info_edit`,
       method: 'GET',
       headers: {
         ...
@@ -172,7 +172,7 @@ module.exports = {
 
       return res.render("agent/updateMainInfo.ejs", {
         title: title,
-        sys_regno: req.params.ra_regno,
+        sys_regno: req.params.sys_regno,
         image1: image1,
         image2: image2,
         image3: image3,
@@ -222,7 +222,7 @@ module.exports = {
     const getUpdateEnteredInfoOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: `/agent/${req.params.ra_regno}/entered_info_process`,
+      path: `/agent/${req.params.sys_regno}/entered_info_process`,
       method: 'GET',
       headers: {
         ...
@@ -240,7 +240,7 @@ module.exports = {
       
       res.render("agent/updateAgentInfo.ejs", {
       title: title,
-      agentId: req.params.ra_regno,
+      agentId: req.params.sys_regno,
       profileImage: profileImage,
       officeHourS: hours != null ? hours[0] : null,
       officeHourE: hours != null ? hours[2] : null

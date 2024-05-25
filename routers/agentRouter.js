@@ -132,7 +132,7 @@ router.post(
 // [msa] agent_page
 //agent 홈 get
 router.get(
-  "/:ra_regno",
+  "/:sys_regno",
   agentController.agentProfile,
 );
 
@@ -162,7 +162,7 @@ router.get(
  *                      type: object
  */
 // [msa] updateAgentInfo 페이지 랜더링
-router.get("/:ra_regno/update", agentController.updateEnteredInfo);
+router.get("/:sys_regno/update", agentController.updateEnteredInfo);
 
 /**
  * @swagger
@@ -191,7 +191,7 @@ router.get("/:ra_regno/update", agentController.updateEnteredInfo);
  */
 // [msa] updateAgentInfo 페이지 랜더링
 router.post(
-  "/:ra_regno/update_process",
+  "/:sys_regno/update_process",
   agentController.upload.single("myImage"),
   agentController.updatingEnteredInfo,
 );
@@ -222,7 +222,7 @@ router.post(
  *                      type: object
  */
 // [msa] agent_page
-router.get("/:ra_regno/info_edit", agentController.updateMainInfo);
+router.get("/:sys_regno/info_edit", agentController.updateMainInfo);
 /**
  * @swagger
  * paths:
@@ -250,7 +250,7 @@ router.get("/:ra_regno/info_edit", agentController.updateMainInfo);
  */
 // [msa] agent_page
 router.post(
-  "/:ra_regno/edit_process",
+  "/:sys_regno/edit_process",
   // agentController.upload.fields([{name: 'myImage1'}, {name: 'myImage2'}, {name: 'myImage3'}]),
   agentController.updatingMainInfo,
 );
