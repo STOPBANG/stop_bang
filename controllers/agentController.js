@@ -188,7 +188,35 @@ module.exports = {
       process.env.JWT_SECRET_KEY
     );
 
-    console.log(req.file);
+    let filename = '';
+    let file_arr = [];
+    if (req.files.myImage1) file_arr[0] = req.files.myImage1[0];
+    if (req.files.myImage2) file_arr[1] = req.files.myImage2[0];
+    if (req.files.myImage3) file_arr[2] = req.files.myImage3[0];
+    
+    let i = 0;
+    /* gcs */
+    for(file of file_arr) {
+        const date = new Date();
+        const fileTime = date.getTime();
+        filename = `${fileTime}-${file.originalname}`;
+        const gcsFileDir = `agent/${filename}`;
+        // gcs에 agent 폴더 밑에 파일이 저장
+        const blob = bucket.file(gcsFileDir);
+        const blobStream = blob.createWriteStream();
+
+        blobStream.on('finish', () => {
+        console.log('gcs upload successed');
+        });
+
+        blobStream.on('error', (err) => {
+        console.log(err);
+        });
+
+        blobStream.end(file.buffer);
+        file_arr[i] = filename;
+        i += 1;
+    }
 
     const postUpdatingMainInfoOptions = {
       host: 'stop_bang_realtor_page',
@@ -201,7 +229,8 @@ module.exports = {
         auth: res.locals.auth
       }
     };
-    let requestBody = { files: req.file, introduction: req.body.introduction, sys_regno: req.body.sys_regno};
+    let requestBody = {file: file_arr, introduction: req.body.introduction, sys_regno: req.body.sys_regno};
+    console.log(requestBody);
     httpRequest(postUpdatingMainInfoOptions, requestBody)
     .then(updatingMainInfoResult => {
   
