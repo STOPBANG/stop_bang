@@ -38,6 +38,8 @@ module.exports = {
     }
   },
 
+  // 후기 열람하기
+  // post("/:ra_regno/opening/:rv_id"
   opening: async (req, res) => {
     //쿠키로부터 로그인 계정 알아오기
     if (req.cookies.authToken == undefined)
@@ -51,9 +53,37 @@ module.exports = {
       if (r_username === null)
         res.render("notFound.ejs", { message: "로그인이 필요합니다" });
       let rv_id = req.params.rv_id;
-      await realtorModel.insertOpenedReview(r_username, rv_id, () => {
+      console.log("resident name: ", r_username);
+      console.log("review id: ", rv_id);
+      console.log(decoded);
+
+      console.log("Main_realtorController 'opening' started")
+      const getOptions = {
+        host: 'stop_bang_realtor_page',
+        port: process.env.MS_PORT,
+        path: `/realtor/openReview/${rv_id}`,
+        method: 'GET',
+        headers: {
+          ...
+          req.headers,
+          'Content-Type': 'application/json',
+        },
+      }
+      // let openRequest = { rv_id: rv_id };
+      // console.log("Request body: ", openRequest);
+      try {
+        const response = await httpRequest(getOptions);
+        // 응답 처리
+        // ...
+        // response 데이터를 사용하여 작업 수행
         res.redirect(`/realtor/${req.params.ra_regno}`);
-      });
+      } catch (error) {
+        // 에러 처리
+        // 에러가 발생했을 때의 동작 수행
+        console.error("HTTP 요청 에러:", error);
+        res.status(500).send("서버 에러 발생");
+      }
+      
     }
   },
   //후기 신고

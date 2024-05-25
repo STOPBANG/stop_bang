@@ -189,8 +189,9 @@ module.exports = {
 		WHERE r_username=?;
 		`;
     getRId = await db.query(getRIdRawQuery, [r_username]);
-    console.log(getRId[0][0].r_id);
-    await db.query(insertRawQuery, [getRId[0][0].r_id, rv_id]);
+    console.log(getRId[0][0].rv_id); // 일단 rv_id로 해봄 원래 r_id였음
+    console.log("후기 열람 버튼 클릭");
+    await db.query(insertRawQuery, [getRId[0][0].rv_id, rv_id]);
     await db.query(usePointRawQuery, [r_username]);
     result();
   },
