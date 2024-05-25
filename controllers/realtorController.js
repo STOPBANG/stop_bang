@@ -80,7 +80,7 @@ module.exports = {
     const postOptions = {
       host: 'stop_bang_bookmark',
       port: process.env.MS_PORT,
-      path: `/realtor/${req.params.ra_regno}/bookmark`,
+      path: `/realtor/${req.params.sys_regno}/bookmark`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

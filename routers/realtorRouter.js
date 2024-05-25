@@ -38,7 +38,7 @@ router.use((req, res, next) => {
  */
 //입주민이 보는 공인중개사 홈페이지
 router.get(
-  "/:ra_regno",
+  "/:sys_regno",
   realtorController.mainPage,
 );
 /**
@@ -66,7 +66,7 @@ router.get(
  *                    users:
  *                      type: object
  */
-router.post("/:ra_regno/bookmark", realtorController.updateBookmark);
+router.post("/:sys_regno/bookmark", realtorController.updateBookmark);
 
 /**
  * @swagger
