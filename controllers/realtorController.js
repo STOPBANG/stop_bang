@@ -22,7 +22,7 @@ module.exports = {
     const getOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: `/realtor/${req.params.ra_regno}`,
+      path: `/realtor/${req.params.sys_regno}`,
       method: 'GET',
       headers: {
         ...
@@ -38,42 +38,6 @@ module.exports = {
     }
   },
 
-  opening: async (req, res) => {
-    //쿠키로부터 로그인 계정 알아오기
-    if (req.cookies.authToken == undefined)
-      res.render("notFound.ejs", { message: "로그인이 필요합니다" });
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      let r_username = decoded.userId;
-      if (r_username === null)
-        res.render("notFound.ejs", { message: "로그인이 필요합니다" });
-      let rv_id = req.params.rv_id;
-      await realtorModel.insertOpenedReview(r_username, rv_id, () => {
-        res.redirect(`/realtor/${req.params.ra_regno}`);
-      });
-    }
-  },
-  //후기 신고
-  reporting: async (req, res) => {
-    //쿠키로부터 로그인 계정 알아오기
-    if (req.cookies.authToken == undefined)
-      res.render("notFound.ejs", { message: "로그인이 필요합니다" });
-    else {
-      const decoded = jwt.verify(
-        req.cookies.authToken,
-        process.env.JWT_SECRET_KEY
-      );
-      let r_username = decoded.userId;
-      if (r_username === null)
-        res.render("notFound.ejs", { message: "로그인이 필요합니다" });
-      ra_regno = await realtorModel.reportProcess(req, r_username);
-      console.log("신고완료");
-      res.redirect(`${req.baseUrl}/${ra_regno[0][0].agentList_ra_regno}`);
-    }
-  },
   /* msa */
   updateBookmark: (req, res) => {
     req.body.userId = res.locals.auth;
