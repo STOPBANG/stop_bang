@@ -251,7 +251,7 @@ router.get("/:sys_regno/info_edit", agentController.updateMainInfo);
 // [msa] agent_page
 router.post(
   "/:sys_regno/edit_process",
-  // agentController.upload.fields([{name: 'myImage1'}, {name: 'myImage2'}, {name: 'myImage3'}]),
+  agentController.upload.fields([{name: 'myImage1'}, {name: 'myImage2'}, {name: 'myImage3'}]),
   agentController.updatingMainInfo,
 );
 
