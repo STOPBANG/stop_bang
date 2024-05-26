@@ -119,7 +119,7 @@ module.exports = {
     const requestBody = {r_username: res.locals.auth};
     httpRequest(updateBookmarkPostOptions, requestBody)
       .then((updateBookmarkResponse) => {
-        res.render(updateBookmarkResponse.body);
+        return res.redirect(`/realtor/${req.params.sys_regno}`);
       });
     }
     // const forwardRequest = http.request(
