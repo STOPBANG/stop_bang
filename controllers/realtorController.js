@@ -106,32 +106,37 @@ module.exports = {
   },
   /* msa */
   updateBookmark: (req, res) => {
-    req.body.userId = res.locals.auth;
-    const postOptions = {
+    // req.body.userId = res.locals.auth;
+    const updateBookmarkPostOptions = {
       host: 'stop_bang_bookmark',
       port: process.env.MS_PORT,
       path: `/realtor/${req.params.sys_regno}/bookmark`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-      },
-      body: {r_username: res.locals.auth}
-    }
-    const forwardRequest = http.request(
-      postOptions,
-      forwardResponse => {
-        res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
-        forwardResponse.pipe(res);
       }
-    )
-    forwardRequest.on('close', () => {
-      console.log('Sent [updateBookmark] message to bookmark microservice.');
-    });
-    forwardRequest.on('error', (err) => {
-      console.log('Failed to send [updateBookmark] message');
-      console.log(err && err.stack || err);
-    });
-    forwardRequest.write(JSON.stringify(req.body));
-    forwardRequest.end();
-  }
+    }
+    const requestBody = {r_username: res.locals.auth};
+    httpRequest(updateBookmarkPostOptions, requestBody)
+      .then((updateBookmarkResponse) => {
+        res.render(updateBookmarkResponse.body);
+      });
+    }
+    // const forwardRequest = http.request(
+    //   postOptions,
+    //   forwardResponse => {
+    //     res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+    //     forwardResponse.pipe(res);
+    //   }
+    // )
+    // forwardRequest.on('close', () => {
+    //   console.log('Sent [updateBookmark] message to bookmark microservice.');
+    // });
+    // forwardRequest.on('error', (err) => {
+    //   console.log('Failed to send [updateBookmark] message');
+    //   console.log(err && err.stack || err);
+    // });
+    // forwardRequest.write(JSON.stringify(req.body));
+    // forwardRequest.end();
+  // }
 };
