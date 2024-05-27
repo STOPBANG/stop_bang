@@ -279,12 +279,12 @@ module.exports = {
   // 부동산 홈페이지 영업시간, 전화번호 수정 사항 저장
   updatingEnteredInfo: (req, res) => {
     let img = '';
-    if (req.files.myImage) img = myImage;
+    if (req.files.myImage) img = req.files.myImage;
     let filename = '';
     /* gcs */
     const date = new Date();
     const fileTime = date.getTime();
-    filename = `${fileTime}-${req.file.originalname}`;
+    filename = `${fileTime}-${img.originalname}`;
     const gcsFileDir = `agent/${filename}`;
     // gcs에 agent 폴더 밑에 파일이 저장
     const blob = bucket.file(gcsFileDir);
@@ -298,20 +298,22 @@ module.exports = {
     console.log(err);
     });
 
-    blobStream.end(req.file.buffer);
+    blobStream.end(img.buffer);
 
     /* msa */
     const postUpdatingEnteredInfoOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: `/realtor/${req.params.sys_regno}/entered_info_update`,
+      path: `/agent/${req.params.sys_regno}/entered_info_update`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       }
     };
 
-    const updatingEnteredInfoRequestBody = {file: file_arr, introduction: req.body.introduction, sys_regno: req.params.sys_regno};
+    const a_office_hours = req.body.office_hour_start + " to " + req.body.office_hour_end;
+
+    const updatingEnteredInfoRequestBody = {file: filename, a_office_hours: a_office_hours, sys_regno: req.params.sys_regno};
     httpRequest(postUpdatingEnteredInfoOptions, updatingEnteredInfoRequestBody)
     .then(updatingEnteredInfoResult => {
   
