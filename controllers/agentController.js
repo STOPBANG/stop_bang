@@ -120,7 +120,7 @@ module.exports = {
         // let r_username = decoded.userId;
         /* msa */
         const getProfileOptions = {
-          host: 'stop_bang_realtor_page',
+          host: 'stop_bang_mypage',
           port: process.env.MS_PORT,
           path: `/agent/${req.params.sys_regno}`,
           method: 'GET',
@@ -153,7 +153,7 @@ module.exports = {
 
     /* msa */
     const getUpdateMainInfoOptions = {
-      host: 'stop_bang_realtor_page',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
       path: `/agent/${req.params.sys_regno}/info_edit`,
       method: 'GET',
@@ -222,7 +222,7 @@ module.exports = {
     }
 
     const postUpdatingMainInfoOptions = {
-      host: 'stop_bang_realtor_page',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
       path: `/agent/${req.body.sys_regno}/edit_process`,
       method: 'POST',
@@ -248,7 +248,7 @@ module.exports = {
   updateEnteredInfo: async (req, res) => {
     /* msa */
     const getUpdateEnteredInfoOptions = {
-      host: 'stop_bang_realtor_page',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
       path: `/agent/${req.params.sys_regno}/entered_info_process`,
       method: 'GET',
@@ -302,7 +302,7 @@ module.exports = {
 
     /* msa */
     const postUpdatingEnteredInfoOptions = {
-      host: 'stop_bang_realtor_page',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
       path: `/agent/${req.params.sys_regno}/entered_info_update`,
       method: 'POST',
@@ -330,9 +330,9 @@ module.exports = {
   settings: (req, res) => {
     /* msa */
     const getOptions = {
-      host: 'stop_bang_agent_mypage',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
-      path: '/settings',
+      path: '/agentMypage/settings',
       method: 'GET',
       headers: {
         ...
@@ -356,7 +356,7 @@ module.exports = {
         }
     );
     forwardRequest.on('close', () => {
-      console.log('Sent [settings] message to agent_mypage microservice.');
+      console.log('Sent [settings] message to mypage microservice.');
     });
     forwardRequest.on('error', (err) => {
       console.log('Failed to send [settings] message');
@@ -369,9 +369,9 @@ module.exports = {
     /* msa */
     req.body.userId = res.locals.auth;
     const postOptions = {
-      host: 'stop_bang_agent_mypage',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
-      path: '/settings/update',
+      path: '/agentMypage/settings/update',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -397,7 +397,7 @@ module.exports = {
         }
     );
     forwardRequest.on('close', () => {
-      console.log('Sent [updateSettings] message to agent_mypage microservice.');
+      console.log('Sent [updateSettings] message to mypage microservice.');
     });
     forwardRequest.on('error', (err) => {
       console.log('Failed to send [updateSettings] message');
@@ -411,9 +411,9 @@ module.exports = {
     /* msa */
     req.body.userId = res.locals.auth;
     const postOptions = {
-      host: 'stop_bang_agent_mypage',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
-      path: '/settings/pwupdate',
+      path: '/agentMypage/settings/pwupdate',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -439,7 +439,7 @@ module.exports = {
         }
     );
     forwardRequest.on('close', () => {
-      console.log('Sent [updatePassword] message to agent_mypage microservice.');
+      console.log('Sent [updatePassword] message to mypage microservice.');
     });
     forwardRequest.on('error', (err) => {
       console.log('Failed to send [updatePassword] message');
@@ -453,9 +453,9 @@ module.exports = {
     /* msa */
     req.body.userId = res.locals.auth;
     const postOptions = {
-      host: 'stop_bang_agent_mypage',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
-      path: '/deleteAccount',
+      path: '/agentMypage/deleteAccount',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -481,7 +481,7 @@ module.exports = {
         }
     )
     forwardRequest.on('close', () => {
-      console.log('Sent [deleteAccount] message to agent_mypage microservice.');
+      console.log('Sent [deleteAccount] message to mypage microservice.');
     });
     forwardRequest.on('error', (err) => {
       console.log('Failed to send [deleteAccount] message');

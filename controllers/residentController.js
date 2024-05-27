@@ -7,9 +7,9 @@ module.exports = {
   myReview: (req, res) => {
     /* msa */
     const getOptions = {
-      host: 'stop_bang_resident_mypage',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
-      path: '/myReview',
+      path: '/resident/myReview',
       method: 'GET',
       headers: {
         ...
@@ -31,7 +31,7 @@ module.exports = {
       }
     );
     forwardRequest.on('close', () => {
-      console.log('Sent [myReview] message to resident_mypage microservice.');
+      console.log('Sent [myReview] message to mypage microservice.');
     });
     forwardRequest.on('error', (err) => {
       console.log('Failed to send [myReview] message');
@@ -42,9 +42,9 @@ module.exports = {
   openReview: (req, res) => {
     /* msa */
     const getOptions = {
-      host: 'stop_bang_resident_mypage',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
-      path: '/openreview',
+      path: '/resident/openreview',
       method: 'GET',
       headers: {
         ...
@@ -66,7 +66,7 @@ module.exports = {
       }
     );
     forwardRequest.on('close', () => {
-      console.log('Sent [openreview] message to resident_mypage microservice.');
+      console.log('Sent [openreview] message to mypage microservice.');
     });
     forwardRequest.on('error', (err) => {
       console.log('Failed to send [openreview] message');
@@ -77,9 +77,9 @@ module.exports = {
   bookmark: (req, res) => {
     /* msa */
     const getOptions = {
-      host: 'stop_bang_resident_mypage',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
-      path: '/bookmark',
+      path: '/resident/bookmark',
       method: 'GET',
       headers: {
         ...
@@ -101,7 +101,7 @@ module.exports = {
       }
     );
     forwardRequest.on('close', () => {
-      console.log('Sent [bookmark] message to resident_mypage microservice.');
+      console.log('Sent [bookmark] message to mypage microservice.');
     });
     forwardRequest.on('error', (err) => {
       console.log('Failed to send [bookmark] message');
@@ -112,9 +112,9 @@ module.exports = {
   deleteBookmark: (req, res) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_resident_mypage',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
-      path: `/bookmark/${req.params.id}/delete`,
+      path: `/resident/bookmark/${req.params.id}/delete`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ module.exports = {
       }
     )
     forwardRequest.on('close', () => {
-      console.log('Sent [deleteBookmark] message to resident_mypage microservice.');
+      console.log('Sent [deleteBookmark] message to mypage microservice.');
     });
     forwardRequest.on('error', (err) => {
       console.log('Failed to send [deleteBookmark] message');
@@ -140,9 +140,9 @@ module.exports = {
   settings: (req, res, next) => {
     /* msa */
     const getOptions = {
-      host: 'stop_bang_resident_mypage',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
-      path: '/settings',
+      path: '/resident/settings',
       method: 'GET',
       headers: {
         ...
@@ -163,7 +163,7 @@ module.exports = {
       }
     );
     forwardRequest.on('close', () => {
-      console.log('Sent [settings] message to resident_mypage microservice.');
+      console.log('Sent [settings] message to mypage microservice.');
     });
     forwardRequest.on('error', (err) => {
       console.log('Failed to send [settings] message');
@@ -174,9 +174,9 @@ module.exports = {
   updateSettings: (req, res, next) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_resident_mypage',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
-      path: '/settings/update',
+      path: '/resident/settings/update',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ module.exports = {
       }
     )
     forwardRequest.on('close', () => {
-      console.log('Sent [updateSettings] message to resident_mypage microservice.');
+      console.log('Sent [updateSettings] message to mypage microservice.');
     });
     forwardRequest.on('error', (err) => {
       console.log('Failed to send [updateSettings] message');
@@ -203,9 +203,9 @@ module.exports = {
   updatePassword: (req, res, next) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_resident_mypage',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
-      path: '/settings/pwupdate',
+      path: '/resident/settings/pwupdate',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ module.exports = {
       }
     )
     forwardRequest.on('close', () => {
-      console.log('Sent [updatePassword] message to resident_mypage microservice.');
+      console.log('Sent [updatePassword] message to mypage microservice.');
     });
     forwardRequest.on('error', (err) => {
       console.log('Failed to send [updatePassword] message');
@@ -232,9 +232,9 @@ module.exports = {
   deleteAccount: async (req, res) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_resident_mypage',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
-      path: '/deleteAccount',
+      path: '/resident/deleteAccount',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -261,7 +261,7 @@ module.exports = {
       }
     )
     forwardRequest.on('close', () => {
-      console.log('Sent [deleteAccount] message to resident_mypage microservice.');
+      console.log('Sent [deleteAccount] message to mypage microservice.');
     });
     forwardRequest.on('error', (err) => {
       console.log('Failed to send [deleteAccount] message');
