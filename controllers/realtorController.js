@@ -20,7 +20,7 @@ module.exports = {
         return res.render("notFound.ejs", { message: "로그인이 필요합니다" });
     
     const getOptions = {
-      host: 'stop_bang_realtor_page',
+      host: 'stop_bang_mypage',
       port: process.env.MS_PORT,
       path: `/realtor/${req.params.sys_regno}`,
       method: 'GET',
@@ -59,7 +59,7 @@ module.exports = {
 
       console.log("Main_realtorController 'opening' started")
       const getOptions = {
-        host: 'stop_bang_realtor_page',
+        host: 'stop_bang_mypage',
         port: process.env.MS_PORT,
         path: `/realtor/openReview/${rv_id}`,
         method: 'GET',
