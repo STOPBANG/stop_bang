@@ -1,6 +1,3 @@
-const residentModel = require("../models/residentModel");
-const tags = require("../public/assets/tag.js");
-const jwt = require("jsonwebtoken");
 const http = require('http');
 
 module.exports = {
