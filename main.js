@@ -30,9 +30,12 @@ app.use((req, res, next) => {
       res.locals.auth = decoded.userId;
       res.locals.id = decoded.id;
       res.locals.userType = req.cookies.userType;
-      res.locals.is_admin = adminControl.getAdmin(decoded.userId);
+      // res.locals.is_admin = adminControl.getAdmin(decoded.userId);
+      res.locals.is_admin = 0;
   } catch (error) {
+  // } catch (error) {
     res.locals.auth = "";
+    // res.locals.auth = "";
     res.locals.id = "";
     res.locals.userType = "";
     res.locals.is_admin = "";

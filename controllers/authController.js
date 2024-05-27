@@ -1,7 +1,3 @@
-const authModel = require("../models/authModel");
-const residentModel = require("../models/residentModel");
-const agentModel = require("../models/agentModel");
-const jwt = require("jsonwebtoken");
 const http = require('http');
 const {httpRequest} = require('../utils/httpRequest');
 

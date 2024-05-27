@@ -1,8 +1,5 @@
-//Models
-const agentModel = require("../models/agentModel.js");
 const tags = require("../public/assets/tag.js");
 const jwt = require("jsonwebtoken");
-const db = require("../config/db.js");
 //multer
 const multer = require("multer");
 const path = require("path");
