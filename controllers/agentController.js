@@ -227,14 +227,11 @@ module.exports = {
       path: `/agent/${req.body.sys_regno}/edit_process`,
       method: 'POST',
       headers: {
-        ...
-            req.headers,
-        auth: res.locals.auth
+        "Content-Type": "application/json",
       }
     };
-    let requestBody = {file: file_arr, introduction: req.body.introduction, sys_regno: req.body.sys_regno};
-    console.log(requestBody);
-    httpRequest(postUpdatingMainInfoOptions, requestBody)
+    const updatingMainInfoRequestBody = {file: file_arr, introduction: req.body.introduction, sys_regno: req.body.sys_regno};
+    httpRequest(postUpdatingMainInfoOptions, updatingMainInfoRequestBody)
     .then(updatingMainInfoResult => {
   
       if (updatingMainInfoResult === null) {
@@ -242,8 +239,7 @@ module.exports = {
           return res.render('notFound.ejs', {message: "이미지 크기가 너무 큽니다. 다른 사이즈로 시도해주세요."})
         }
       } else {
-        res.locals.redirect = `/agent/${req.body.sys_regno}`;
-        next();
+        return res.redirect(`/agent/${req.body.sys_regno}`);
       }
     })
   },
@@ -282,36 +278,51 @@ module.exports = {
 
   // 부동산 홈페이지 영업시간, 전화번호 수정 사항 저장
   updatingEnteredInfo: (req, res) => {
+    let img = '';
+    if (req.files.myImage) img = myImage;
+    let filename = '';
+    /* gcs */
+    const date = new Date();
+    const fileTime = date.getTime();
+    filename = `${fileTime}-${req.file.originalname}`;
+    const gcsFileDir = `agent/${filename}`;
+    // gcs에 agent 폴더 밑에 파일이 저장
+    const blob = bucket.file(gcsFileDir);
+    const blobStream = blob.createWriteStream();
+
+    blobStream.on('finish', () => {
+    console.log('gcs upload successed');
+    });
+
+    blobStream.on('error', (err) => {
+    console.log(err);
+    });
+
+    blobStream.end(req.file.buffer);
+
     /* msa */
-    const postOptions = {
+    const postUpdatingEnteredInfoOptions = {
       host: 'stop_bang_realtor_page',
       port: process.env.MS_PORT,
-      path: `/realtor/${req.params.id}/entered_info_update`,
+      path: `/realtor/${req.params.sys_regno}/entered_info_update`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       }
     };
 
-    const forwardRequest = http.request(
-        postOptions,
-        forwardResponse => {
-          res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
-          forwardResponse.pipe(res);
+    const updatingEnteredInfoRequestBody = {file: file_arr, introduction: req.body.introduction, sys_regno: req.params.sys_regno};
+    httpRequest(postUpdatingEnteredInfoOptions, updatingEnteredInfoRequestBody)
+    .then(updatingEnteredInfoResult => {
+  
+      if (updatingEnteredInfoResult === null) {
+        if (error === "imageError") {
+          return res.render('notFound.ejs', {message: "이미지 크기가 너무 큽니다. 다른 사이즈로 시도해주세요."})
         }
-    );
-
-    forwardRequest.on('close', () => {
-      console.log('Sent [updatingEnteredInfo] message to realtor_page microservice.');
-    });
-
-    forwardRequest.on('error', (err) => {
-      console.log('Failed to send [updatingEnteredInfo] message');
-      console.log(err && err.stack || err);
-    });
-
-    forwardRequest.write(JSON.stringify(req.body));
-    forwardRequest.end();
+      } else {
+        return res.redirect(`/agent/${req.params.sys_regno}`);
+      }
+    })
   },
 
   settings: (req, res) => {
