@@ -36,9 +36,19 @@
 	<span class="layout-column">
 		<label style="margin: 10px 0; float: right;"><%= review.created_time %>작성</label>
 		<% let isReported = false; %>
+<<<<<<< Updated upstream
 		<% if(report != undefined) { %>
 			<% report.forEach(repo => { %>
 			<% if(repo.repo_rv_id === review.rv_id) isReported = true; }); %>
+=======
+		<% if(report !== undefined) { %>
+			<% report.forEach(repo => { %> <!-- report의 각 요소에 대해 반복 -->
+				<% if (report !== undefined && report.some(repo => repo.repo_rv_id === review.id)) { %>
+					<% isReported = true; %>
+				<% } %>
+				
+			<% }) %>
+>>>>>>> Stashed changes
 		<% } %>
 		<% if(!isReported) { %>
 			<!-- This is a button toggling the modal -->

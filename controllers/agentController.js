@@ -124,13 +124,15 @@ module.exports = {
           headers: {
             ...
                 req.headers,
-            auth: res.locals.auth
+            auth: res.locals.auth,
+            'Content-Type': 'application/json',
           }
         }
         httpRequest(getProfileOptions)
             .then(profileResult => {
               if (profileResult.body.length)
                 return res.render('notFound.ejs', {message: "접근이 제한되었습니다. 공인중개사 계정으로 로그인하세요"});
+              console.log("profileResult.body: ", profileResult.body);
               return res.render("agent/agentIndex", profileResult.body);
             })
       }
