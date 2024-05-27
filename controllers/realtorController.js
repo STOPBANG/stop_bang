@@ -98,7 +98,7 @@ module.exports = {
       );
       let a_id = decoded.userId;
       if(a_id === null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
-      ra_regno = await agentModel.reportProcess(req, a_id);
+      // ra_regno = await agentModel.reportProcess(req, a_id);
       //
       const rv_id = req.params.rv_id;
       /* msa */

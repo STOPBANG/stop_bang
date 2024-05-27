@@ -37,9 +37,9 @@
     <% let isMyReview = false; %>
     <% if(review.resident_r_id == r_id) isMyReview = true; %>
     <% let isOpened = false; %>
-    <% if(opened != null) { %>
-      <% opened.forEach(open => { %>
-      <% if(openedReviewData.review_rv_id === review.id) isOpened = true; }); %>
+    <% if(openedReviewData != null) { %>
+      <% openedReviewData.forEach(open => { %>
+      <% if(open.review_rv_id === review.id) isOpened = true; }); %>
     <% } %>
 
     <% if(!isOpened && !isMyReview) { %>
