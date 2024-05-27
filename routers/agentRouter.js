@@ -192,7 +192,7 @@ router.get("/:sys_regno/update", agentController.updateEnteredInfo);
 // [msa] updateAgentInfo 페이지 랜더링
 router.post(
   "/:sys_regno/update_process",
-  agentController.upload.single("myImage"),
+  agentController.upload.fields([{name: 'myImage'}]),
   agentController.updatingEnteredInfo,
 );
 

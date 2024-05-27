@@ -279,7 +279,7 @@ module.exports = {
   // 부동산 홈페이지 영업시간, 전화번호 수정 사항 저장
   updatingEnteredInfo: (req, res) => {
     let img = '';
-    if (req.files.myImage) img = req.files.myImage;
+    if (req.files.myImage) img = req.files.myImage[0];
     let filename = '';
     /* gcs */
     const date = new Date();
@@ -406,6 +406,7 @@ module.exports = {
     forwardRequest.write(JSON.stringify(req.body));
     req.pipe(forwardRequest);
   },
+
   updatePassword: (req, res) => {
     /* msa */
     req.body.userId = res.locals.auth;
