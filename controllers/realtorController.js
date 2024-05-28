@@ -38,9 +38,8 @@ module.exports = {
     }
   },
 
-  // 후기 열람하기
-  // post("/:ra_regno/opening/:rv_id"
-  opening: async (req, res) => {
+  /** 후기 열람하기 - 직접메시징
+   opening: async (req, res) => {
     //쿠키로부터 로그인 계정 알아오기
     if (req.cookies.authToken == undefined)
       res.render("notFound.ejs", { message: "로그인이 필요합니다" });
@@ -86,6 +85,43 @@ module.exports = {
       
     }
   },
+  */
+
+  // 후기 열람하기 - 간접메시징
+  opening: async (req, res) => {
+    const decoded = jwt.verify(
+      req.cookies.authToken,
+      process.env.JWT_SECRET_KEY
+    );
+    let r_id = decoded.id;
+    const rv_id = req.params.rv_id;
+
+    const postOpenOptions = {
+      host: "stop_bang_review",
+      port: process.env.MS_PORT,
+      path: `/review/postOpenedReview/${rv_id}`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    let requestBody = { 
+        r_id: r_id,
+        rv_id: rv_id,
+    };
+
+    try{
+      await httpRequest(postOpenOptions, requestBody)
+    .then(httpres => {
+      console.log(httpres);
+      res.redirect(`/realtor/${req.params.ra_regno}`);
+    })
+    } catch(error){
+      console.error("HTTP 요청 에러:", error);
+      res.status(500).send("서버 에러 발생");
+  }
+},
+
   //후기 신고
   /* msa */
   reporting: async (req, res) => {
