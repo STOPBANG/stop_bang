@@ -47,13 +47,13 @@
       </tr>
 
       <tr>
-        <td><label for="agentList_ra_regno">중개업등록번호</label></td>
+        <td><label for="agentList_sys_regno">중개업등록번호</label></td>
         <td>
           <input
             class="uk-input"
-            id="agentList_ra_regno"
-            name="agentList_ra_regno"
-            placeholder="111-33-4444"
+            id="agentList_sys_regno"
+            name="agentList_sys_regno"
+            placeholder="115002018000208"
             required
           />
         </td>
@@ -71,7 +71,7 @@
 
       <tr>
         <td><label for="email">본인 확인 이메일 (필수)</label></td>
-        <td><input class="uk-input" name="email" id="email" placeholder="이메일 입력" type="email" value=""required /></td>
+        <td><input class="uk-input" name="email" id="email" placeholder="이메일 입력" type="email" value="" required /></td>
       </tr>
 
       <tr
@@ -143,10 +143,10 @@
   }
 
   async function getAgentPhoneNumber() {
-    const raRegnoElement = document.getElementById("agentList_ra_regno");
+    const sysRegnoElement = document.getElementById("agentList_sys_regno");
 
     const response = await fetch(
-      `/auth/phoneNumber?raRegno=${raRegnoElement.value}`
+      `/auth/phoneNumber?sysRegno=${sysRegnoElement.value}`
     );
     const result = await response.json();
     if (!result.phoneNumber)

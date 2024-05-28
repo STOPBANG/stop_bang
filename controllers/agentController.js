@@ -46,24 +46,6 @@ module.exports = {
     },
   }),
 
-  getAgentPhoneNumber: async (req, res) => {
-    const ra_regno = req.query.raRegno;
-
-    /* msa */
-    const getOptions = {
-      host: 'stop_bang_register',
-      port: process.env.MS_PORT,
-      path: `/phoneNumber/${ra_regno}`,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    }
-    const result = await httpRequest(getOptions);
-
-    return res.json(result.body);
-  },
-
   //후기 신고
   reporting: async (req, res) => {
     console.log("(main): reporting 함수 시작");
