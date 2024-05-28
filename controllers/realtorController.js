@@ -76,7 +76,7 @@ module.exports = {
         // 응답 처리
         // ...
         // response 데이터를 사용하여 작업 수행
-        res.redirect(`/realtor/${req.params.ra_regno}`);
+        res.redirect(`/realtor/${req.params.sys_regno}`);
       } catch (error) {
         // 에러 처리
         // 에러가 발생했을 때의 동작 수행
