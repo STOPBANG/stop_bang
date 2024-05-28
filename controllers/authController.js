@@ -67,22 +67,14 @@ module.exports = {
     };
 
     const requestBody = req.body;
-    const request = http.request(
-      postOptions,
-      forwardResponse => {
-        res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
-        forwardResponse.pipe(res);
-      }
-    );
-    request.on('close', () => {
-      console.log('Sent message to microservice.');
-    });
-    request.on('error', (err) => {
-      console.log('Failed to send message');
-      console.log(err && err.stack || err);
-    });
-    request.write(JSON.stringify(requestBody));
-    request.end();
+
+    httpRequest(postOptions, requestBody)
+      .then(response => {
+        if(response.body.message){
+          return res.render('notFound.ejs', {message: response.body.message});
+        }
+        return res.send(response.body);
+      })
   },
 
   registerResidentView: (req, res) => {
@@ -100,27 +92,15 @@ module.exports = {
         'Content-Type': 'application/json',
       }
     };
+    const requestBody = req.body;
 
-    const forwardRequest = http.request(
-        postOptions,
-        forwardResponse => {
-          console.log("authController 복귀");
-          res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
-          forwardResponse.pipe(res);
+    httpRequest(postOptions, requestBody)
+      .then(response => {
+        if(response.body.message){
+          return res.render('notFound.ejs', {message: response.body.message});
         }
-    );
-
-    forwardRequest.on('close', () => {
-      console.log('Sent [registerAgent] message to register microservice.');
-    });
-
-    forwardRequest.on('error', (err) => {
-      console.log('Failed to send [registerAgent] message');
-      console.log(err && err.stack || err);
-    });
-
-    forwardRequest.write(JSON.stringify(req.body));
-    forwardRequest.end();
+        return res.send(response.body);
+      })
   },
 
   getAgentPhoneNumber: async (req, res) => {
