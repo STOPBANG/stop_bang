@@ -7,7 +7,7 @@ module.exports = {
   getAgency: async (req, res) => {
     const { sgg_nm, bjdong_nm } = req.query;
     const postOptions = {
-      host: 'stop_bang_map',
+      host: 'map-ms',
       port: process.env.MS_PORT,
       path: `/search/agencies`,
       method: 'POST',
@@ -30,7 +30,7 @@ module.exports = {
     const { sgg_nm, bjdong_nm, cmp_nm } = req.query;
     
     const postOptions = {
-      host: 'stop_bang_map',
+      host: 'map-ms',
       port: process.env.MS_PORT,
       path: `/search/agencyName`,
       method: 'POST',
