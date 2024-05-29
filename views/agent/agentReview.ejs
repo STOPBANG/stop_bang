@@ -31,6 +31,7 @@
 			<span class="uk-label" style="margin-right:5px; margin-bottom:5px;"><%= tagsData[element] %></span>
 			<% }) %>
 		<p class="rv-content"><%- review.content %></p>
+		<input type="hidden" id="reviewId" value="<%- review.id %>" class="hidden-input">
 	</span>
 	
 	<span class="layout-column">
@@ -43,13 +44,14 @@
 		<% if(!isReported) { %>
 			<!-- This is a button toggling the modal -->
 			<button class="uk-button uk-button-default uk-margin-small-right" type="button" uk-toggle="target: #modal-example">신고</button>
-
+			
 			<!-- This is the modal -->
 			<div id="modal-example" uk-modal>
 				<div class="uk-modal-dialog uk-modal-body">
 					<form id="reportForm" method="get">
 					<!-- <form action="/agent/report/<%= review.id %>" method="get"> -->
 						<h2 class="uk-modal-title">🚨나쁜 후기입니까?🚨</h2>
+
 						<label><b>신고 사유 선택</b></label>
 						<div class="report-radio-container" name="reason">
 						<label><input style="margin: 15px;" class="uk-radio" type="radio" required="required" name="reason" value=1>사칭/사기</label>
@@ -74,7 +76,8 @@
 	document.getElementById('submitBtn').addEventListener('click', function(event) {
 		event.preventDefault(); // 기존의 submit 행동을 막습니다.
 		const reason = document.querySelector('input[name="reason"]:checked').value; // 선택된 신고 사유의 값을 가져옵니다.
-		const rv_id = '<%= review.id %>'; // 서버에서 동적으로 할당되는 rv_id 값을 가져옵니다.
+		// const rv_id = '<%= review.id %>'; // 서버에서 동적으로 할당되는 rv_id 값을 가져옵니다.
+		const rv_id = document.getElementById('reviewId').value;
 		const form = document.getElementById('reportForm');
 		form.action = `/agent/report/${rv_id}/${reason}`; // 폼의 action 속성을 설정합니다.
 		form.submit(); // 폼을 제출합니다.
