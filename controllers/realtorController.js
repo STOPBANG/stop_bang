@@ -113,7 +113,7 @@ module.exports = {
     try{
       await httpRequest(postOpenOptions, requestBody)
     .then(() => {
-      res.redirect(`/realtor/${req.params.ra_regno}`);
+      res.redirect(`/realtor/${req.params.sys_regno}`);
     })
     } catch(error){
       console.error("HTTP 요청 에러:", error);
