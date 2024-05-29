@@ -112,8 +112,7 @@ module.exports = {
 
     try{
       await httpRequest(postOpenOptions, requestBody)
-    .then(httpres => {
-      console.log(httpres);
+    .then(() => {
       res.redirect(`/realtor/${req.params.ra_regno}`);
     })
     } catch(error){
