@@ -38,9 +38,8 @@ module.exports = {
     }
   },
 
-  // 후기 열람하기
-  // post("/:ra_regno/opening/:rv_id"
-  opening: async (req, res) => {
+  /** 후기 열람하기 - 직접메시징
+   opening: async (req, res) => {
     //쿠키로부터 로그인 계정 알아오기
     if (req.cookies.authToken == undefined)
       res.render("notFound.ejs", { message: "로그인이 필요합니다" });
@@ -76,7 +75,7 @@ module.exports = {
         // 응답 처리
         // ...
         // response 데이터를 사용하여 작업 수행
-        res.redirect(`/realtor/${req.params.ra_regno}`);
+        res.redirect(`/realtor/${req.params.sys_regno}`);
       } catch (error) {
         // 에러 처리
         // 에러가 발생했을 때의 동작 수행
@@ -86,24 +85,81 @@ module.exports = {
       
     }
   },
+  */
+
+  // 후기 열람하기 - 간접메시징
+  opening: async (req, res) => {
+    const decoded = jwt.verify(
+      req.cookies.authToken,
+      process.env.JWT_SECRET_KEY
+    );
+    let r_id = decoded.id;
+    const rv_id = req.params.rv_id;
+
+    const postOpenOptions = {
+      host: "stop_bang_review",
+      port: process.env.MS_PORT,
+      path: `/review/postOpenedReview/${rv_id}`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    let requestBody = { 
+        r_id: r_id,
+        rv_id: rv_id,
+    };
+
+    try{
+      await httpRequest(postOpenOptions, requestBody)
+    .then(() => {
+      res.redirect(`/realtor/${req.params.sys_regno}`);
+    })
+    } catch(error){
+      console.error("HTTP 요청 에러:", error);
+      res.status(500).send("서버 에러 발생");
+  }
+},
+
   //후기 신고
+  /* msa */
   reporting: async (req, res) => {
     //쿠키로부터 로그인 계정 알아오기
-    if (req.cookies.authToken == undefined)
-      res.render("notFound.ejs", { message: "로그인이 필요합니다" });
+    if (req.cookies.authToken == undefined) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
     else {
       const decoded = jwt.verify(
         req.cookies.authToken,
         process.env.JWT_SECRET_KEY
       );
-      let r_username = decoded.userId;
-      if (r_username === null)
-        res.render("notFound.ejs", { message: "로그인이 필요합니다" });
-      ra_regno = await realtorModel.reportProcess(req, r_username);
+      let a_id = decoded.userId;
+      if(a_id === null) res.render('notFound.ejs', {message: "로그인이 필요합니다"});
+      // ra_regno = await agentModel.reportProcess(req, a_id);
+      //
+      const rv_id = req.params.rv_id;
+      /* msa */
+      const postOptions = {
+        host: 'stop_bang_bookmark',
+        port: process.env.MS_PORT,
+        path: `/agent/report`,
+        method: 'POST',
+        headers: {
+          ...
+          req.headers,
+          'Content-Type': 'application/json',
+        }
+      }
+      let requestBody = { rv_id: rv_id, a_id: a_id };
+      const agentList_ra_regno = httpRequest(postOptions, requestBody)
+        .then((response) => {
+          //return res.json({rows: response.body})
+          const agentList_ra_regno = response.body;
+          res.redirect(`${req.baseUrl}/${agentList_ra_regno}`);
+      })
       console.log("신고완료");
-      res.redirect(`${req.baseUrl}/${ra_regno[0][0].agentList_ra_regno}`);
     }
   },
+
+
   /* msa */
   updateBookmark: (req, res) => {
   const updateBookmarkPostOptions = {

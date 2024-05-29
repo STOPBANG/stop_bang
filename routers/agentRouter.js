@@ -7,30 +7,6 @@ const agentController = require("../controllers/agentController.js");
 /**
  * @swagger
  * paths:
- *  /agent/phoneNumber:
- *    get:
- *      summary: "공인중개사 회원 가입 시 공공데이터의 전화번호 조회"
- *      description: "공인중개사 회원 가입 시 DB에 저장된 서울시 부동산 공공데이터 중 ra_regno에 해당하는 전화번호 조회"
- *      tags: [Agent]
- *      responses:
- *        "200":
- *          description: 전화번호 조회 성공
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                    ok:
- *                      type: boolean
- *                    users:
- *                      type: object
- */
-// [msa] register
-router.get("/phoneNumber", agentController.getAgentPhoneNumber);
-
-/**
- * @swagger
- * paths:
  *  /agent/settings:
  *    get:
  *      summary: "공인중개사 회원 마이페이지"

@@ -124,14 +124,14 @@ module.exports = {
   },
 
   getAgentPhoneNumber: async (req, res) => {
-    const ra_regno = req.query.raRegno;
-    console.log(`${ra_regno}`)
+    const sys_regno = req.query.sysRegno;
+    console.log(`${sys_regno}`)
 
     /* msa */
     const getOptions = {
       host: 'register-ms',
       port: process.env.MS_PORT,
-      path: `/phoneNumber/${ra_regno}`,
+      path: `/phoneNumber/${sys_regno}`,
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

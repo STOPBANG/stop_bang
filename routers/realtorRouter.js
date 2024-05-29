@@ -97,7 +97,7 @@ router.post("/:sys_regno/bookmark", realtorController.updateBookmark);
  *                      type: object
  */
 //후기를 열람할 때
-router.post("/:ra_regno/opening/:rv_id", realtorController.opening);
+router.post("/:sys_regno/opening/:rv_id", realtorController.opening);
 
 /**
  * @swagger

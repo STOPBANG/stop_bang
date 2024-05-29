@@ -37,9 +37,9 @@
     <% let isMyReview = false; %>
     <% if(review.resident_r_id == r_id) isMyReview = true; %>
     <% let isOpened = false; %>
-    <% if(opened != null) { %>
-      <% opened.forEach(open => { %>
-      <% if(openedReviewData.review_rv_id === review.id) isOpened = true; }); %>
+    <% if(openedReviewData != null) { %>
+      <% openedReviewData.forEach(open => { %>
+      <% if(open.review_rv_id === review.id) isOpened = true; }); %>
     <% } %>
 
     <% if(!isOpened && !isMyReview) { %>
@@ -55,7 +55,7 @@
     <% if(who == 1) { %>
       <% if(!isOpened && !isMyReview) { %>
         <% if(canOpen === 1) { %>
-            <form action="/realtor/<%= review.ra_regno %>/opening/<%= review.rv_id %>" method="post"> 
+            <form action="/realtor/<%= review.agentList_ra_regno %>/opening/<%= review.rv_id %>" method="post"> 
             <input type='submit' class="uk-button uk-button-default" style="margin: 10px 0; float: right;" onclick="return window.confirm('후기를 열람하면 2 🧻 휴지를 사용하게 됩니다. 열람하시겠습니까?');" value='열람'>
             </form>
         <% } else { %>

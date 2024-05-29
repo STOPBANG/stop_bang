@@ -38,7 +38,7 @@
 	<% } else { %>
 		<% agentReviewData.forEach(review => { %>
 			<% if(review.check_repo === 0) { %>
-				<%- include('./agentReview.ejs', {a_username: review.username, review: review, tags: review.tags, tagsData: tagsData}) %>
+				<%- include('./agentReview.ejs', {a_username: review.username, review: review, tags: review.tags, tagsData: tagsData, report: report}) %>
 			<% } else { %>
 				<%- include('./agentRepoReview.ejs', {review: review}); %>
     		<% } %>

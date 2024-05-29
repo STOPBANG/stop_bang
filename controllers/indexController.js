@@ -9,11 +9,14 @@ module.exports = {
           req.cookies.authToken,
           process.env.JWT_SECRET_KEY
         );
-        let r_id = decoded.userId;
-        const is_admin = await adminControl.getAdmin(r_id);
-        res.render("index", { is_admin: is_admin });
-      } else {
+      //   let r_id = decoded.userId;
+      //   const is_admin = await adminControl.getAdmin(r_id);
+      //   res.render("index", { is_admin: is_admin });
+      // } else {
         res.render("index");  
+      }
+      else{
+        res.render("index");
       }
     } catch (err) {
       console.log(err);
