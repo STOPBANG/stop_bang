@@ -207,23 +207,29 @@ module.exports = {
         i += 1;
         continue;
       }
+
       const date = new Date();
       const fileTime = date.getTime();
       filename = `${fileTime}-${file.originalname}`;
       const gcsFileDir = `agent/${filename}`;
       // gcs에 agent 폴더 밑에 파일이 저장
       const blob = bucket.file(gcsFileDir);
-      const blobStream = blob.createWriteStream();
 
-      blobStream.on('finish', () => {
-      console.log('gcs upload successed');
+      await new Promise((resolve, reject) => { // 즉각적인 사진 조회를 위한 Promise 처리 추가
+        const blobStream = blob.createWriteStream();
+
+        blobStream.on('finish', () => {
+        console.log('gcs upload successed');
+        resolve();
+        });
+  
+        blobStream.on('error', (err) => {
+        console.log(err);
+        reject(err);
+        });
+  
+        blobStream.end(file.buffer);
       });
-
-      blobStream.on('error', (err) => {
-      console.log(err);
-      });
-
-      blobStream.end(file.buffer);
       file_arr[i] = filename;
       i += 1;
     }
@@ -295,17 +301,23 @@ module.exports = {
     const gcsFileDir = `agent/${filename}`;
     // gcs에 agent 폴더 밑에 파일이 저장
     const blob = bucket.file(gcsFileDir);
+
+    await new Promise((resolve, reject) => {
+
     const blobStream = blob.createWriteStream();
 
     blobStream.on('finish', () => {
-    console.log('gcs upload successed');
+      console.log('gcs upload successed');
+      resolve();
     });
 
     blobStream.on('error', (err) => {
-    console.log(err);
+      console.log(err);
+      reject(err);
     });
 
     blobStream.end(img.buffer);
+  });
 
     /* msa */
     const postUpdatingEnteredInfoOptions = {
