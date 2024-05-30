@@ -46,6 +46,24 @@ module.exports = {
     },
   }),
 
+  getAgentPhoneNumber: async (req, res) => {
+    const ra_regno = req.query.raRegno;
+
+    /* msa */
+    const getOptions = {
+      host: 'register-ms',
+      port: process.env.MS_PORT,
+      path: `/phoneNumber/${ra_regno}`,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }
+    const result = await httpRequest(getOptions);
+
+    return res.json(result.body);
+  },
+
   //후기 신고
   reporting: async (req, res) => {
     console.log("(main): reporting 함수 시작");
@@ -65,7 +83,7 @@ module.exports = {
 
         /* msa */
         const postOptions = {
-          host: 'stop_bang_bookmark',
+          host: 'bookmark-ms',
           port: process.env.MS_PORT,
           path: `/agent/report`,
           method: 'POST',
@@ -99,7 +117,7 @@ module.exports = {
         // let r_username = decoded.userId;
         /* msa */
         const getProfileOptions = {
-          host: 'stop_bang_mypage',
+          host: 'mypage-ms',
           port: process.env.MS_PORT,
           path: `/agent/${req.params.sys_regno}`,
           method: 'GET',
@@ -134,7 +152,7 @@ module.exports = {
 
     /* msa */
     const getUpdateMainInfoOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: `/agent/${req.params.sys_regno}/info_edit`,
       method: 'GET',
@@ -203,7 +221,7 @@ module.exports = {
     }
 
     const postUpdatingMainInfoOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: `/agent/${req.body.sys_regno}/edit_process`,
       method: 'POST',
@@ -229,7 +247,7 @@ module.exports = {
   updateEnteredInfo: async (req, res) => {
     /* msa */
     const getUpdateEnteredInfoOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: `/agent/${req.params.sys_regno}/entered_info_process`,
       method: 'GET',
@@ -283,7 +301,7 @@ module.exports = {
 
     /* msa */
     const postUpdatingEnteredInfoOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: `/agent/${req.params.sys_regno}/entered_info_update`,
       method: 'POST',
@@ -311,7 +329,7 @@ module.exports = {
   settings: (req, res) => {
     /* msa */
     const getOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: '/agentMypage/settings',
       method: 'GET',
@@ -350,7 +368,7 @@ module.exports = {
     /* msa */
     req.body.userId = res.locals.auth;
     const postOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: '/agentMypage/settings/update',
       method: 'POST',
@@ -392,7 +410,7 @@ module.exports = {
     /* msa */
     req.body.userId = res.locals.auth;
     const postOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: '/agentMypage/settings/pwupdate',
       method: 'POST',
@@ -434,7 +452,7 @@ module.exports = {
     /* msa */
     req.body.userId = res.locals.auth;
     const postOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: '/agentMypage/deleteAccount',
       method: 'POST',

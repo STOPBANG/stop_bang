@@ -6,7 +6,7 @@ module.exports = {
   createReview: async (req, res) => {
     console.log(req.params.sys_regno);
     const postOptions = {
-      host: 'stop_bang_review',
+      host: 'review-ms',
       port: process.env.MS_PORT,
       path: `/review/create/${req.params.sys_regno}`,
       method: 'POST',
@@ -44,7 +44,7 @@ module.exports = {
   creatingReview: (req, res) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_review',
+      host: 'review-ms',
       port: process.env.MS_PORT,
       path: `/review/create_process/${req.params.sys_regno}`,
       method: 'POST',
@@ -71,7 +71,7 @@ module.exports = {
 
     /* msa */
     const getOptionsReview = {
-      host: 'stop_bang_review',
+      host: 'review-ms',
       port: process.env.MS_PORT,
       path: `/review/update/${req.params.rv_id}`,
       method: 'GET',
@@ -105,7 +105,7 @@ module.exports = {
   updatingReview: async (req, res) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_review',
+      host: 'review-ms',
       port: process.env.MS_PORT,
       path: `/review/update_process/${req.params.rv_id}`,
       method: 'POST',
