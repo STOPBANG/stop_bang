@@ -24,7 +24,7 @@
       <% } %>
       <% } %>
     </div>
-    <p>이 작성자의 후기 평균: <%- rating %></p>
+    <p>이 작성자의 후기 평균: <%- review.rating %></p>
     <% if(tags !== null) { %>
       <% tags.split("").forEach((element, index) => { %>
           <% if(tagsData && tagsData[element]) { %>
