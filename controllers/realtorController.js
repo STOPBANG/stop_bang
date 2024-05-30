@@ -1,6 +1,5 @@
 //Models
 const e = require("express");
-const realtorModel = require("../models/realtorModel.js");
 const jwt = require("jsonwebtoken");
 const http = require('http');
 const {httpRequest} = require('../utils/httpRequest.js');
