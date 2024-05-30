@@ -3,7 +3,7 @@
 <div class="row">
     <div class="left">
       <div class="photo-left">
-        <% if(agentPrivate.a_profile_image == null) { %>
+        <% if(agentPrivate == null || agentPrivate.a_profile_image == null) { %>
             <img class = "photo" src="/images/none-image-status.jpg">
         <% } else { %>
             <img class = "photo" src="<%= agentPrivate.a_profile_image %>" />
