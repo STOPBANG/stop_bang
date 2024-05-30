@@ -20,7 +20,7 @@ module.exports = {
         return res.render("notFound.ejs", { message: "로그인이 필요합니다" });
     
     const getOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: `/realtor/${req.params.sys_regno}`,
       method: 'GET',
@@ -58,7 +58,7 @@ module.exports = {
 
       console.log("Main_realtorController 'opening' started")
       const getOptions = {
-        host: 'stop_bang_mypage',
+        host: 'mypage-ms',
         port: process.env.MS_PORT,
         path: `/realtor/openReview/${rv_id}`,
         method: 'GET',
@@ -163,7 +163,7 @@ module.exports = {
   /* msa */
   updateBookmark: (req, res) => {
   const updateBookmarkPostOptions = {
-    host: 'stop_bang_bookmark',
+    host: 'bookmark-ms',
     port: process.env.MS_PORT,
     path: `/realtor/${req.params.sys_regno}/bookmark`,
     method: 'POST',

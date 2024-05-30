@@ -4,7 +4,7 @@ module.exports = {
   myReview: (req, res) => {
     /* msa */
     const getOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: '/resident/myReview',
       method: 'GET',
@@ -39,7 +39,7 @@ module.exports = {
   openReview: (req, res) => {
     /* msa */
     const getOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: '/resident/openreview',
       method: 'GET',
@@ -74,7 +74,7 @@ module.exports = {
   bookmark: (req, res) => {
     /* msa */
     const getOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: '/resident/bookmark',
       method: 'GET',
@@ -109,7 +109,7 @@ module.exports = {
   deleteBookmark: (req, res) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: `/resident/bookmark/${req.params.id}/delete`,
       method: 'POST',
@@ -137,7 +137,7 @@ module.exports = {
   settings: (req, res, next) => {
     /* msa */
     const getOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: '/resident/settings',
       method: 'GET',
@@ -171,7 +171,7 @@ module.exports = {
   updateSettings: (req, res, next) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: '/resident/settings/update',
       method: 'POST',
@@ -200,7 +200,7 @@ module.exports = {
   updatePassword: (req, res, next) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: '/resident/settings/pwupdate',
       method: 'POST',
@@ -229,7 +229,7 @@ module.exports = {
   deleteAccount: async (req, res) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_mypage',
+      host: 'mypage-ms',
       port: process.env.MS_PORT,
       path: '/resident/deleteAccount',
       method: 'POST',

@@ -10,7 +10,7 @@ module.exports = {
     try {
       /* msa */
       const postOptions = {
-        host: 'stop_bang_register',
+        host: 'register-ms',
         port: process.env.MS_PORT,
         path: `/certification`,
         method: 'POST',
@@ -34,7 +34,7 @@ module.exports = {
     try {
       /* msa */
       const postOptions = {
-        host: 'stop_bang_register',
+        host: 'register-ms',
         port: process.env.MS_PORT,
         path: `/certification-check`,
         method: 'POST',
@@ -57,7 +57,7 @@ module.exports = {
   registerResident: (req, res) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_register',
+      host: 'register-ms',
       port: process.env.MS_PORT,
       path: `/register/resident`,
       method: 'POST',
@@ -92,7 +92,7 @@ module.exports = {
   registerAgent: (req, res) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_register',
+      host: 'register-ms',
       port: process.env.MS_PORT,
       path: `/register/agent`,
       method: 'POST',
@@ -129,7 +129,7 @@ module.exports = {
 
     /* msa */
     const getOptions = {
-      host: 'stop_bang_register',
+      host: 'register-ms',
       port: process.env.MS_PORT,
       path: `/phoneNumber/${sys_regno}`,
       method: 'GET',
@@ -149,7 +149,7 @@ module.exports = {
   login: (req, res) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_login_logout',
+      host: 'login-logout-ms',
       port: process.env.MS_PORT,
       path: '/login',
       method: 'POST',
@@ -183,7 +183,7 @@ module.exports = {
   logout: (req, res) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_login_logout',
+      host: 'login-logout-ms',
       port: process.env.MS_PORT,
       path: '/logout',
       method: 'GET',
