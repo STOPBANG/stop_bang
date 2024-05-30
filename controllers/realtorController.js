@@ -38,7 +38,7 @@ module.exports = {
     }
   },
 
-  /** 후기 열람하기 - 직접메시징
+
    opening: async (req, res) => {
     //쿠키로부터 로그인 계정 알아오기
     if (req.cookies.authToken == undefined)
@@ -85,8 +85,9 @@ module.exports = {
       
     }
   },
-  */
+  
 
+  /*
   // 후기 열람하기 - 간접메시징
   opening: async (req, res) => {
     const decoded = jwt.verify(
@@ -120,6 +121,7 @@ module.exports = {
       res.status(500).send("서버 에러 발생");
   }
 },
+*/
 
   //후기 신고
   /* msa */
