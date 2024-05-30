@@ -31,27 +31,27 @@ module.exports = {
   },
 
   certificationCheck: async (req, res) => {
-    try {
-      /* msa */
-      const postOptions = {
-        host: 'register-ms',
-        port: process.env.MS_PORT,
-        path: `/certification-check`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      };
-  
-      const requestBody = req.body;
-      httpRequest(postOptions, requestBody)
+    /* msa */
+    const postOptions = {
+      host: 'stop_bang_register',
+      port: process.env.MS_PORT,
+      path: `/certification-check`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    };
+
+    const requestBody = req.body;
+    httpRequest(postOptions, requestBody)
         .then(response => {
-          return res.send(response.body);
+          const result = response.body.result;
+          console.log("result code : ", result);
+          if (result === "404") {
+            return res.status(404).send("사용자가 입력한 코드와 일치하는 데이터를 찾지 못했습니다.")
+          }
+          return res.send();
         })
-    } catch (error) {
-      console.log(error);
-      res.status(500).send("Server Error");
-    }
   },
 
   registerResident: (req, res) => {
