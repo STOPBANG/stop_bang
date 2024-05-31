@@ -1,4 +1,5 @@
 const http = require('http');
+const {httpRequest} = require("../utils/httpRequest.js");
 
 module.exports = {
   myReview: (req, res) => {
@@ -36,7 +37,7 @@ module.exports = {
     });
     req.pipe(forwardRequest);
   },
-  openReview: (req, res) => {
+  openReview: async (req, res) => {
     /* msa */
     const getOptions = {
       host: 'mypage-ms',
@@ -49,27 +50,9 @@ module.exports = {
         auth: res.locals.auth,
         id: res.locals.id
       }
-    }
-    const forwardRequest = http.request(
-      getOptions,
-      forwardResponse => {
-        let data = '';
-        forwardResponse.on('data', chunk => {
-          data += chunk;
-        });
-        forwardResponse.on('end', () => {
-          return res.render("resident/openReview", JSON.parse(data));
-        });
-      }
-    );
-    forwardRequest.on('close', () => {
-      console.log('Sent [openreview] message to mypage microservice.');
-    });
-    forwardRequest.on('error', (err) => {
-      console.log('Failed to send [openreview] message');
-      console.log(err && err.stack || err);
-    });
-    req.pipe(forwardRequest);
+    };
+    const response = await httpRequest(getOptions);
+    return res.render("resident/openReview", response.body);
   },
   bookmark: (req, res) => {
     /* msa */
