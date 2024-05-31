@@ -33,7 +33,7 @@ module.exports = {
   certificationCheck: async (req, res) => {
     /* msa */
     const postOptions = {
-      host: 'stop_bang_register',
+      host: 'register-ms',
       port: process.env.MS_PORT,
       path: `/certification-check`,
       method: 'POST',
