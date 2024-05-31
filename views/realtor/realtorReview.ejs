@@ -24,7 +24,7 @@
       <% } %>
       <% } %>
     </div>
-    <p>이 작성자의 후기 평균: <%- rating %></p>
+    <p>이 작성자의 후기 평균: <%- review.rating %></p>
     <% if(tags !== null) { %>
       <% tags.split("").forEach((element, index) => { %>
           <% if(tagsData && tagsData[element]) { %>
@@ -71,30 +71,43 @@
         <% } %>
         <% if(!isReported) { %>
         <!-- This is a button toggling the modal -->
-        <button class="uk-button uk-button-default uk-margin-small-right" type="button" uk-toggle="target: #modal-example">신고</button>
+        <button class="uk-button uk-button-default uk-margin-small-right" type="button" uk-toggle="target: #modal-example-<%= review.id %>">신고</button>
 
         <!-- This is the modal -->
-        <div id="modal-example" uk-modal>
+        <div id="modal-example-<%= review.id %>" uk-modal>
           <div class="uk-modal-dialog uk-modal-body">
-            <form action=<%= `/realtor/report/${review.rv_id}` %>>
-              <h2 class="uk-modal-title">🚨나쁜 후기입니까?🚨</h2>
-              <label><b>신고 사유 선택</b></label>
-              <div class="report-radio-container" name="reason">
-                <label><input style="margin: 15px;" class="uk-radio" type="radio" required="required" name="reason" value=1>사칭/사기</label>
-                </br>
-                <label><input style="margin: 15px;" class="uk-radio" type="radio" required="required" name="reason" value=2>욕설/비하</label>
-                </br>
-                <label><input style="margin: 15px;" class="uk-radio" type="radio" required="required" name="reason" value=3>부적절한 내용</label>
+            <form id="reportForm-<%= review.id %>" method="get">
+              <!-- <form action="/agent/report/<%= review.id %>" method="get"> -->
+                  <h2 class="uk-modal-title">🚨나쁜 후기입니까?🚨</h2>
+                  <label><b>신고 사유 선택</b></label>
+                  <div class="report-radio-container" name="reason">
+                    <label><input style="margin: 15px;" class="uk-radio" type="radio" required="required" name="reason-<%= review.id %>" value="1">사칭/사기</label>
+                    </br>
+                    <label><input style="margin: 15px;" class="uk-radio" type="radio" required="required" name="reason-<%= review.id %>" value="2">욕설/비하</label>
+                    </br>
+                    <label><input style="margin: 15px;" class="uk-radio" type="radio" required="required" name="reason-<%= review.id %>" value="3">부적절한 내용</label>
+                    </div>
+                    <button class="uk-button uk-button-default uk-modal-close" type="button">취소</button>
+                    <button class="uk-button uk-button-primary submitBtn" data-rv-id="<%= review.id %>" type="submit">신고</button>
+                </form>
               </div>
-              <button class="uk-button uk-button-default uk-modal-close" type="button">취소</button>
-              <button class="uk-button uk-button-primary" type="submit">신고</button>
-            </form>
-          </div>
-        </div>
-        <% } else { %>
-        <lable style="margin: 10px 0; float: right; text-align: right;">🚔신고 완료</lable>
-        <% } %>
+            </div>
+            <% } else { %>
+              <label style="margin: 10px 0; float: right; text-align: right;">🚔신고 완료</label>
+          <% } %>
       <% } %>
     <% } %>
   </span>
 </div>
+<script>
+  document.querySelectorAll('.submitBtn').forEach(button => {
+      button.addEventListener('click', function(event) {
+          event.preventDefault(); // 기존의 submit 행동을 막습니다.
+          const rv_id = this.dataset.rvId; // 서버에서 동적으로 할당되는 rv_id 값을 가져옵니다.
+          const reason = document.querySelector(`input[name="reason-${rv_id}"]:checked`).value; // 선택된 신고 사유의 값을 가져옵니다.
+          const form = document.getElementById(`reportForm-${rv_id}`);
+          form.action = `/realtor/report/${rv_id}`; // 폼의 action 속성을 설정합니다.
+          form.submit(); // 폼을 제출합니다.
+      });
+  });
+</script>
