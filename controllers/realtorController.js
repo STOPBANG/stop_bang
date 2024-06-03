@@ -84,43 +84,6 @@ module.exports = {
       
     }
   },
-  
-
-  /*
-  // 후기 열람하기 - 간접메시징
-  opening: async (req, res) => {
-    const decoded = jwt.verify(
-      req.cookies.authToken,
-      process.env.JWT_SECRET_KEY
-    );
-    let r_id = decoded.id;
-    const rv_id = req.params.rv_id;
-
-    const postOpenOptions = {
-      host: "stop_bang_review",
-      port: process.env.MS_PORT,
-      path: `/review/postOpenedReview/${rv_id}`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-    let requestBody = { 
-        r_id: r_id,
-        rv_id: rv_id,
-    };
-
-    try{
-      await httpRequest(postOpenOptions, requestBody)
-    .then(() => {
-      res.redirect(`/realtor/${req.params.sys_regno}`);
-    })
-    } catch(error){
-      console.error("HTTP 요청 에러:", error);
-      res.status(500).send("서버 에러 발생");
-  }
-},
-*/
 
   //후기 신고
   /* msa */
