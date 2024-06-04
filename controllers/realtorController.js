@@ -37,7 +37,6 @@ module.exports = {
     }
   },
 
-
    opening: async (req, res) => {
     //쿠키로부터 로그인 계정 알아오기
     if (req.cookies.authToken == undefined)
