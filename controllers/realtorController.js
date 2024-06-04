@@ -101,7 +101,7 @@ module.exports = {
       const rv_id = req.params.rv_id;
       /* msa */
       const postOptions = {
-        host: 'stop_bang_bookmark',
+        host: 'bookmark-ms',
         port: process.env.MS_PORT,
         path: `/agent/report`,
         method: 'POST',
@@ -113,12 +113,12 @@ module.exports = {
       }
       let requestBody = { rv_id: rv_id, a_id: a_id };
       const agentList_ra_regno = httpRequest(postOptions, requestBody)
-        .then((response) => {
-          //return res.json({rows: response.body})
-          const agentList_ra_regno = response.body;
-          res.redirect(`${req.baseUrl}/${agentList_ra_regno}`);
-      })
-      console.log("신고완료");
+      .then((response) => {
+        //return res.json({rows: response.body})
+        const agentList_ra_regno = response.body;
+        res.redirect(`${req.baseUrl}/${agentList_ra_regno}`);
+    })
+    console.log("신고완료");
     }
   },
 
