@@ -42,7 +42,7 @@
       <% if(open.review_rv_id === review.id) isOpened = true; }); %>
     <% } %>
 
-    <% if(!isOpened && !isMyReview) { %>
+    <% if(!isOpened && !isMyReview && who == 1) { %>
     <p class="rv-content blur-content"><%- review.content %></p>
     <% } else { %>
     <p class="rv-content"><%- review.content %></p>
